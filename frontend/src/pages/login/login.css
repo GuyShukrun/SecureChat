@@ -1,0 +1,20 @@
+.logo {
+  /* color: #08d9d6; */
+  font-size: 50px;
+  font-weight: 800;
+  color: #000b49;
+}
+
+.img-fluid {
+  display: block;
+  margin: auto;
+  width: 90%;
+}
+
+.notRegisteredYet {
+  font-size: 18px;
+}
+
+a {
+  color: #6441a5;
+}
