@@ -1,4 +1,3 @@
-import FileUpload from "./components/FileUpload/FileUpload";
 import { useEffect, useState } from "react";
 import Login from "./pages/login/Login";
 import Register from "./pages/register/Register";

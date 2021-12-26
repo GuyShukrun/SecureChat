@@ -4,6 +4,7 @@ import { useRef } from "react";
 import MenuIcon from "@mui/icons-material/Menu";
 import SearchIcon from "@mui/icons-material/Search";
 import SendIcon from "@mui/icons-material/Send";
+import Message from "../../components/Message/Message";
 export default function Chat({ user, setUser }) {
   const handleLogout = () => {
     setUser(null);
@@ -196,16 +197,8 @@ export default function Chat({ user, setUser }) {
             <h6 className="user-fullname-upper-chat">User fullname</h6>
           </div>
           <div className="chat-panel  ">
-            <div className="message-wrapper bg-white ">
-              <div className="chat-bubble">
-                <span className="chat-bubble-text-left">Hello dude</span>
-              </div>
-            </div>
-            <div className="message-wrapper bg-white ">
-              <div className="chat-bubble chat-bubble-right">
-                <span className="chat-bubble-text-right">Hello dude</span>
-              </div>
-            </div>
+            <Message own={false} />
+            <Message own={true} />
           </div>
 
           <div className="lower-chat">

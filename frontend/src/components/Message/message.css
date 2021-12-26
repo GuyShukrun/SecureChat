@@ -1,0 +1,27 @@
+.message-wrapper {
+  /* margin-top: 50px; */
+  padding: 10px 10px;
+}
+
+.chat-bubble {
+  padding: 10px 14px;
+  background: #eee;
+  margin: 3px 15px;
+  border-radius: 9px;
+  width: 30%;
+  /* animation: fadeIn 1s ease-in; */
+}
+
+.chat-bubble-text-left {
+  background: #eee;
+}
+
+.chat-bubble-right {
+  margin-left: 67%;
+  background: #74b9ff;
+  color: white;
+}
+
+.chat-bubble-text-right {
+  background: #74b9ff;
+}
