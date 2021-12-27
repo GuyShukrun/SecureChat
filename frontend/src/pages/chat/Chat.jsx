@@ -1,10 +1,13 @@
 import React from "react";
 import "./chat.css";
 import { useRef } from "react";
+import Select from "@mui/material/Select";
+import LogoutIcon from "@mui/icons-material/Logout";
 import MenuIcon from "@mui/icons-material/Menu";
 import SearchIcon from "@mui/icons-material/Search";
 import SendIcon from "@mui/icons-material/Send";
 import Message from "../../components/Message/Message";
+import Conversation from "../../components/Conversation/Conversation";
 export default function Chat({ user, setUser }) {
   const handleLogout = () => {
     setUser(null);
@@ -26,7 +29,7 @@ export default function Chat({ user, setUser }) {
               src="https://www.clarity-enhanced.net/wp-content/uploads/2020/06/filip.jpg"
               alt="User's profile"
             />
-            <MenuIcon className="settingsIcon " />
+            <LogoutIcon className="settingsIcon" onClick={handleLogout} />
           </div>
           <div className="search-box">
             <div className="input-group rounded">
@@ -41,149 +44,11 @@ export default function Chat({ user, setUser }) {
             </div>
           </div>
           <div className="conversations-container bg-white ">
-            <div className="conversation bg-white">
-              <img
-                className="profile-img rounded-circle img-fluid"
-                src="https://www.clarity-enhanced.net/wp-content/uploads/2020/06/robocop.jpg"
-                alt=""
-              />
-              <div className="conversation-user-text  bg-white">
-                <h6 className=" user-fullname bg-white">User fullname</h6>
-                <p className="text-muted  message-preview bg-white">
-                  Last message preview
-                </p>
-              </div>
-              <span className="time text-muted bg-white small float-right">
-                13:21
-              </span>
-            </div>
-            <hr />
-
-            <div className="conversation bg-white">
-              <img
-                className="profile-img rounded-circle img-fluid"
-                src="https://www.clarity-enhanced.net/wp-content/uploads/2020/06/robocop.jpg"
-                alt=""
-              />
-              <div className="conversation-user-text bg-white ">
-                <h6 className="bg-white user-fullname">User fullname</h6>
-                <p className="text-muted bg-white message-preview">
-                  Last message preview
-                </p>
-              </div>
-              <span className="time text-muted small bg-white float-right">
-                13:21
-              </span>
-            </div>
-            <hr />
-
-            <div className="conversation bg-white">
-              <img
-                className="profile-img rounded-circle img-fluid"
-                src="https://www.clarity-enhanced.net/wp-content/uploads/2020/06/robocop.jpg"
-                alt=""
-              />
-              <div className="conversation-user-text bg-white ">
-                <h6 className="bg-white user-fullname">User fullname</h6>
-                <p className="text-muted bg-white message-preview">
-                  Last message preview
-                </p>
-              </div>
-              <span className="time text-muted small bg-white float-right">
-                13:21
-              </span>
-            </div>
-            <hr />
-
-            <div className="conversation bg-white">
-              <img
-                className="profile-img rounded-circle img-fluid"
-                src="https://www.clarity-enhanced.net/wp-content/uploads/2020/06/robocop.jpg"
-                alt=""
-              />
-              <div className="conversation-user-text bg-white ">
-                <h6 className="bg-white user-fullname">User fullname</h6>
-                <p className="text-muted bg-white message-preview">
-                  Last message preview
-                </p>
-              </div>
-              <span className="time text-muted small bg-white float-right">
-                13:21
-              </span>
-            </div>
-            <hr />
-
-            <div className="conversation bg-white">
-              <img
-                className="profile-img rounded-circle img-fluid"
-                src="https://www.clarity-enhanced.net/wp-content/uploads/2020/06/robocop.jpg"
-                alt=""
-              />
-              <div className="conversation-user-text bg-white ">
-                <h6 className="bg-white user-fullname">User fullname</h6>
-                <p className="text-muted bg-white message-preview">
-                  Last message preview
-                </p>
-              </div>
-              <span className="time text-muted small bg-white float-right">
-                13:21
-              </span>
-            </div>
-            <hr />
-
-            <div className="conversation bg-white">
-              <img
-                className="profile-img rounded-circle img-fluid"
-                src="https://www.clarity-enhanced.net/wp-content/uploads/2020/06/robocop.jpg"
-                alt=""
-              />
-              <div className="conversation-user-text bg-white ">
-                <h6 className="bg-white user-fullname">User fullname</h6>
-                <p className="text-muted bg-white message-preview">
-                  Last message preview
-                </p>
-              </div>
-              <span className="time text-muted small bg-white float-right">
-                13:21
-              </span>
-            </div>
-            <hr />
-
-            <div className="conversation bg-white">
-              <img
-                className="profile-img rounded-circle img-fluid"
-                src="https://www.clarity-enhanced.net/wp-content/uploads/2020/06/robocop.jpg"
-                alt=""
-              />
-              <div className="conversation-user-text bg-white ">
-                <h6 className="bg-white user-fullname">User fullname</h6>
-                <p className="text-muted bg-white message-preview">
-                  Last message preview
-                </p>
-              </div>
-              <span className="time text-muted small bg-white float-right">
-                13:21
-              </span>
-            </div>
-            <hr />
-
-            <div className="conversation bg-white">
-              <img
-                className="profile-img rounded-circle img-fluid"
-                src="https://www.clarity-enhanced.net/wp-content/uploads/2020/06/robocop.jpg"
-                alt=""
-              />
-              <div className="conversation-user-text bg-white ">
-                <h6 className="bg-white user-fullname">User fullname</h6>
-                <p className="text-muted bg-white message-preview">
-                  Last message preview
-                </p>
-              </div>
-              <span className="time text-muted small bg-white float-right">
-                13:21
-              </span>
-            </div>
-            <hr />
+            <Conversation />
+            <Conversation />
+            <Conversation />
+            <Conversation />
+            <Conversation />
           </div>
         </div>
 

@@ -8,20 +8,27 @@
   background: #eee;
   margin: 3px 15px;
   border-radius: 9px;
-  width: 30%;
+  /* overflow: auto; */
+  /* width: 30%; */
   /* animation: fadeIn 1s ease-in; */
+  width: fit-content;
 }
 
 .chat-bubble-text-left {
   background: #eee;
+  /* display: inline; */
+  /* float: left; */
 }
 
 .chat-bubble-right {
-  margin-left: 67%;
+  /* margin-left: 67%; */
+  float: right;
   background: #74b9ff;
   color: white;
 }
 
 .chat-bubble-text-right {
   background: #74b9ff;
+  display: inline-block;
+  /* width: fit-content; */
 }
