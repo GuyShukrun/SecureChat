@@ -1,6 +1,8 @@
 .message-wrapper {
   /* margin-top: 50px; */
   padding: 10px 10px;
+  /* display: flex; */
+  /* justify-content: space-between; */
 }
 
 .chat-bubble {
@@ -19,15 +21,20 @@
   /* display: inline; */
   /* float: left; */
 }
-
+/* .chat-bubble-left {
+  float: left;
+} */
 .chat-bubble-right {
-  /* margin-left: 67%; */
-  float: right;
+  /* float: right; */
+  margin-left: auto;
+  margin-right: 0;
   background: #74b9ff;
   color: white;
 }
 
 .chat-bubble-text-right {
+  /* float: right; */
+
   background: #74b9ff;
   display: inline-block;
   /* width: fit-content; */

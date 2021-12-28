@@ -42,8 +42,9 @@
 }
 
 hr {
-  margin-left: 20% !important;
+  margin: auto !important;
+  /* margin-left: 20% !important;
   margin-top: 3% !important;
-  margin-bottom: 3% !important;
+  margin-bottom: 3% !important; */
   width: 60%;
 }

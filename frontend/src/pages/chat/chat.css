@@ -118,3 +118,9 @@
 .chat-panel .col-4 {
   background: white;
 }
+
+.noConversationText {
+  font-size: 25px;
+  display: table;
+  margin: 50px auto;
+}

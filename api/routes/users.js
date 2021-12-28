@@ -7,29 +7,9 @@ const multer = require("multer");
 const { v4: uuidv4 } = require("uuid");
 //CRUD
 
-// Create new user (Registration)
-// router.post("/register", async (req, res) => {
-//   try {
-//     const hashPass = await bcrypt.hash(req.body.password, saltRounds);
-//     console.log(hashPass);
-//     const newUser = new User({
-//       fullname: req.body.fullname,
-//       email: req.body.email,
-//       password: hashPass,
-//     });
-//     console.log(newUser);
-//     const user = await newUser.save();
-//     res.status(200).json(user);
-//   } catch (err) {
-//     res.status(500).json(err);
-//   }
-// });
-
-// Registration (with image upload)
-
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "./uploads");
+    cb(null, "../frontend/public/uploads");
   },
   filename: (req, file, cb) => {
     const fileName = file.originalname.toLowerCase().split(" ").join("-");
@@ -57,9 +37,7 @@ router.post("/register", upload.single("profileImg"), async (req, res) => {
   try {
     const url = req.protocol + "://" + req.get("host"); // url for the website
     const hashPass = await bcrypt.hash(req.body.password, saltRounds);
-    const profilePictureUrl = req.file
-      ? url + "/uploads/" + req.file.filename
-      : url + "/uploads/noAvatar.png";
+    const profilePictureUrl = req.file ? req.file.filename : "noAvatar.png";
     const newUser = new User({
       fullname: req.body.fullname,
       email: req.body.email,
