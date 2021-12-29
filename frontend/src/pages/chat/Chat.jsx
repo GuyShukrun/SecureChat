@@ -19,6 +19,7 @@ export default function Chat({ user, setUser }) {
 
   const message = useRef("");
   const scrollRef = useRef();
+  const search = useRef("");
   const socket = useRef();
   const handleLogout = () => {
     socket.disconnect(); // disconnect socket
@@ -26,6 +27,9 @@ export default function Chat({ user, setUser }) {
     localStorage.clear();
   };
 
+  const handleSearch = () => {
+    console.log(search.current.value);
+  };
   // Set socket on first render
   // Set behavior on getting message
   useEffect(() => {
@@ -151,9 +155,11 @@ export default function Chat({ user, setUser }) {
                 <SearchIcon className="bg-white text-secondary" />
               </span>
               <input
+                ref={search}
                 type="search"
                 className="form-control rounded border-0 shadow-none"
                 placeholder="Search"
+                onChange={handleSearch}
               />
             </div>
           </div>

@@ -5,6 +5,7 @@ import "./conversation.css";
 export default function Conversation({ conversation, currentUser }) {
   const PF = process.env.REACT_APP_PUBLIC_FOLDER;
   const [user, setUser] = useState(null);
+  const [lastMessage, setLastMessage] = useState(null);
   useEffect(() => {
     const friendId = conversation.members.find((m) => m !== currentUser._id);
     const getUser = async () => {
@@ -19,6 +20,21 @@ export default function Conversation({ conversation, currentUser }) {
     };
     getUser();
   }, []);
+
+  useEffect(() => {
+    const getLastMessage = async () => {
+      try {
+        const res = await axios(
+          "http://localhost:8800/api/messages/lastMessage/" + conversation._id
+        );
+        setLastMessage(res.data);
+        console.log(res.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getLastMessage();
+  }, []);
   return (
     <>
       <div className="conversation bg-white">
@@ -30,11 +46,14 @@ export default function Conversation({ conversation, currentUser }) {
         <div className="conversation-user-text bg-white ">
           <h6 className="bg-white user-fullname">{user?.fullname}</h6>
           <p className="text-muted bg-white message-preview">
-            Last message preview
+            {lastMessage?.text}
           </p>
         </div>
         <span className="time text-muted small bg-white float-right">
-          13:21
+          {new Date(lastMessage?.createdAt).toLocaleTimeString("en-il", {
+            hour: "2-digit",
+            minute: "2-digit",
+          })}
         </span>
       </div>
       <hr />

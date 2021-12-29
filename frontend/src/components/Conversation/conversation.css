@@ -27,6 +27,13 @@
   width: 80%;
   float: left;
   background: white;
+
+  /* display: inline-block; */
+  white-space: nowrap;
+  /* width: calc(70%); */
+
+  overflow: hidden !important;
+  text-overflow: ellipsis;
 }
 
 .time {
@@ -39,6 +46,8 @@
 
 .message-preview {
   margin: 0;
+  overflow: hidden !important;
+  text-overflow: ellipsis;
 }
 
 hr {

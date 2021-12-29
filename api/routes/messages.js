@@ -25,4 +25,17 @@ router.get("/:conversationId", async (req, res) => {
     res.status(500).json(err);
   }
 });
+
+// Get last message within a conversation for displaying in chat converasations page
+router.get("/lastMessage/:conversationId", async (req, res) => {
+  try {
+    const messages = await Message.find({
+      conversationId: req.params.conversationId,
+    });
+    res.status(200).json(messages[messages.length - 1]);
+  } catch (error) {
+    res.status(500).json(err);
+  }
+});
+
 module.exports = router;

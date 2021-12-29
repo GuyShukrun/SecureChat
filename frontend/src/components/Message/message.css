@@ -8,7 +8,7 @@
 .chat-bubble {
   padding: 10px 14px;
   background: #eee;
-  margin: 3px 15px;
+  margin: 3px 0px;
   border-radius: 9px;
   /* overflow: auto; */
   /* width: 30%; */
@@ -38,4 +38,19 @@
   background: #74b9ff;
   display: inline-block;
   /* width: fit-content; */
+}
+
+.chat-time-left {
+  background: white;
+  font-size: 11px;
+  margin-left: 5px;
+  width: fit-content;
+}
+
+.chat-time-right {
+  margin-left: auto;
+  margin-right: 0;
+  background: white;
+  font-size: 11px;
+  width: fit-content;
 }
