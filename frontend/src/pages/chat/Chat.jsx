@@ -9,6 +9,7 @@ import Message from "../../components/Message/Message";
 import axios from "axios";
 import { io } from "socket.io-client";
 import Conversation from "../../components/Conversation/Conversation";
+import User from "../../components/User/User";
 export default function Chat({ user, setUser }) {
   const PF = process.env.REACT_APP_PUBLIC_FOLDER;
   const [conversations, setConversations] = useState([]);
@@ -16,6 +17,12 @@ export default function Chat({ user, setUser }) {
   const [currentConversation, setCurrentConversation] = useState(null);
   const [messages, setMessages] = useState([]);
   const [arrivalMessage, setArrivalMessage] = useState(null);
+  const [isSearching, setIsSearching] = useState(false);
+  const [usersNoConversationsFound, setUsersNoConversationsFound] = useState(
+    []
+  );
+  const [usersWithConversationsFound, setUsersWithConversationsFound] =
+    useState([]);
 
   const message = useRef("");
   const scrollRef = useRef();
@@ -27,9 +34,39 @@ export default function Chat({ user, setUser }) {
     localStorage.clear();
   };
 
-  const handleSearch = () => {
-    console.log(search.current.value);
+  const handleSearch = async () => {
+    if (search.current.value) {
+      setIsSearching(true);
+      try {
+        const res = await axios.get(
+          "http://localhost:8800/api/users/search/" + search.current.value
+        );
+        // const usersWithConversation = res.data.filter((user2) => {
+        //   user2._id !== user._id && conversations.members.includes(user2._id);
+        // });
+        // console.log(usersWithConversation);
+        // const users = res.data.filter((user2) => user2._id !== user._id);
+        const usersWithConversation = res.data.filter(
+          (user2) =>
+            user2._id !== user._id &&
+            conversations.some((c) => c.members.includes(user2._id))
+        );
+        const usersWithoutConversations = res.data.filter(
+          (user2) =>
+            user._id != user2._id && !usersWithConversation.includes(user2)
+        );
+        setUsersNoConversationsFound(usersWithoutConversations);
+        setUsersWithConversationsFound(usersWithConversation);
+      } catch (error) {
+        console.log(error);
+      }
+    } else {
+      setIsSearching(false);
+      setUsersNoConversationsFound([]);
+      setUsersWithConversationsFound([]);
+    }
   };
+
   // Set socket on first render
   // Set behavior on getting message
   useEffect(() => {
@@ -164,11 +201,34 @@ export default function Chat({ user, setUser }) {
             </div>
           </div>
           <div className="conversations-container bg-white ">
-            {conversations.map((c) => (
-              <div onClick={() => setCurrentConversation(c)}>
-                <Conversation conversation={c} currentUser={user} />
-              </div>
-            ))}
+            {usersWithConversationsFound.length > 0
+              ? isSearching && <div>Chats</div>
+              : null}
+            {isSearching
+              ? // Displaying exist chats
+                usersWithConversationsFound.map((user) => (
+                  <div>
+                    <User user={user} />
+                  </div>
+                ))
+              : conversations.map((c) => (
+                  <div onClick={() => setCurrentConversation(c)}>
+                    <Conversation conversation={c} currentUser={user} />
+                  </div>
+                ))}
+
+            {usersNoConversationsFound.length > 0
+              ? isSearching && <div>Friends</div>
+              : null}
+
+            {isSearching
+              ? // Displaying non exist chats
+                usersNoConversationsFound.map((user) => (
+                  <div>
+                    <User user={user} />
+                  </div>
+                ))
+              : null}
           </div>
         </div>
 
