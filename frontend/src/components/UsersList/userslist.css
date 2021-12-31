@@ -1,0 +1,37 @@
+.search-box {
+  background: #fafafa;
+  padding: 10px 13px;
+}
+
+.conversations-container {
+  height: calc(100vh - 200px) !important;
+  overflow-y: scroll;
+}
+
+.conversations-container::-webkit-scrollbar {
+  width: 7px;
+}
+
+.conversations-container::-webkit-scrollbar-thumb {
+  background: #eee;
+}
+
+.conversations-container::-webkit-scrollbar-track {
+  background: #fafafa;
+}
+
+.upper-chat {
+  background: #eee;
+  padding: 10px 15px;
+  border-radius: 7px;
+  display: flex;
+  float: left;
+  width: 100%;
+  align-items: center;
+}
+
+.user-fullname-upper-chat {
+  background: #eee;
+  margin-top: 7px;
+  margin-left: 10px;
+}

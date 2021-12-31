@@ -2,7 +2,11 @@ import React from "react";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import "./conversation.css";
-export default function Conversation({ conversation, currentUser }) {
+export default function Conversation({
+  conversation,
+  currentUser,
+  gotMessage,
+}) {
   const PF = process.env.REACT_APP_PUBLIC_FOLDER;
 
   const [user, setUser] = useState(null);
@@ -34,7 +38,7 @@ export default function Conversation({ conversation, currentUser }) {
       }
     };
     getLastMessage();
-  }, []);
+  }, [gotMessage]);
   if (user === null || lastMessage === null) return null;
   else
     return (

@@ -7,7 +7,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import SendIcon from "@mui/icons-material/Send";
 import Message from "../../components/Message/Message";
 import axios from "axios";
-import { io } from "socket.io-client";
+import { io, Socket } from "socket.io-client";
 import Conversation from "../../components/Conversation/Conversation";
 import User from "../../components/User/User";
 export default function Chat({ user, setUser }) {
@@ -21,15 +21,16 @@ export default function Chat({ user, setUser }) {
   const [usersNoConversationsFound, setUsersNoConversationsFound] = useState(
     []
   );
-  const [usersWithConversationsFound, setUsersWithConversationsFound] =
-    useState([]);
+  const [gotMessage, setGotMessage] = useState(false);
+  const [searchConversations, setSearchConversations] = useState([]);
 
   const message = useRef("");
   const scrollRef = useRef();
   const search = useRef("");
   const socket = useRef();
+
   const handleLogout = () => {
-    socket.disconnect(); // disconnect socket
+    socket.current.disconnect();
     setUser(null);
     localStorage.clear();
   };
@@ -37,15 +38,12 @@ export default function Chat({ user, setUser }) {
   const handleSearch = async () => {
     if (search.current.value) {
       setIsSearching(true);
+      setSearchConversations([]);
+
       try {
         const res = await axios.get(
           "http://localhost:8800/api/users/search/" + search.current.value
         );
-        // const usersWithConversation = res.data.filter((user2) => {
-        //   user2._id !== user._id && conversations.members.includes(user2._id);
-        // });
-        // console.log(usersWithConversation);
-        // const users = res.data.filter((user2) => user2._id !== user._id);
         const usersWithConversation = res.data.filter(
           (user2) =>
             user2._id !== user._id &&
@@ -55,15 +53,19 @@ export default function Chat({ user, setUser }) {
           (user2) =>
             user._id != user2._id && !usersWithConversation.includes(user2)
         );
+
+        const conversationsSearch = conversations.filter((c) =>
+          usersWithConversation.some((user2) => c.members.includes(user2._id))
+        );
+        setSearchConversations(conversationsSearch);
         setUsersNoConversationsFound(usersWithoutConversations);
-        setUsersWithConversationsFound(usersWithConversation);
       } catch (error) {
         console.log(error);
       }
     } else {
-      setIsSearching(false);
       setUsersNoConversationsFound([]);
-      setUsersWithConversationsFound([]);
+      setSearchConversations([]);
+      setIsSearching(false);
     }
   };
 
@@ -73,6 +75,7 @@ export default function Chat({ user, setUser }) {
     socket.current = io("ws://localhost:8900");
     socket.current.on("getMessage", (data) => {
       setArrivalMessage({
+        conversations: data.conversation,
         sender: data.senderId,
         text: data.text,
         createdAt: Date.now(),
@@ -86,6 +89,16 @@ export default function Chat({ user, setUser }) {
       currentConversation?.members.includes(arrivalMessage.sender) &&
       setMessages((prev) => [...prev, arrivalMessage]);
   }, [arrivalMessage, currentConversation]);
+
+  useEffect(() => {
+    if (arrivalMessage) {
+      setGotMessage(!gotMessage);
+      if (!conversations.includes(arrivalMessage.conversation)) {
+        conversations.unshift(arrivalMessage.conversation);
+        setConversations(conversations);
+      }
+    }
+  }, [arrivalMessage]);
 
   useEffect(() => {
     socket?.current.emit("addUser", user._id);
@@ -155,25 +168,104 @@ export default function Chat({ user, setUser }) {
         sender: user._id,
         text: message.current.value,
       };
-
-      socket.current.emit("sendMessage", {
-        senderId: user._id,
-        receiverId: friend._id,
-        text: message.current.value,
-      });
       try {
+        let conversationNew;
+        if (!newMessage.conversationId) {
+          const res = await axios.post(
+            "http://localhost:8800/api/conversations",
+            { senderId: user._id, receiverId: friend._id }
+          );
+          conversationNew = res.data;
+          setCurrentConversation(res.data);
+          conversations.unshift(res.data);
+          setConversations(conversations);
+          newMessage.conversationId = res.data._id;
+        }
+
         const res = await axios.post(
           "http://localhost:8800/api/messages/",
           newMessage
         );
         setMessages([...messages, res.data]);
         message.current.value = "";
+        setGotMessage(!gotMessage);
+        socket.current.emit("sendMessage", {
+          conversation: conversationNew,
+          senderId: user._id,
+          receiverId: friend._id,
+          text: message.current.value,
+        });
       } catch (error) {
         console.log(error);
       }
     }
   };
 
+  const searchInProgress = () => {
+    if (
+      searchConversations.length > 0 &&
+      usersNoConversationsFound.length > 0
+    ) {
+      return (
+        <>
+          <div className="tab">Chats</div>
+          {searchConversations.map((c) => (
+            <div onClick={() => setCurrentConversation(c)}>
+              <Conversation conversation={c} currentUser={user} />
+            </div>
+          ))}
+          <div className="tab">Friends</div>
+          {usersNoConversationsFound.map((friend) => (
+            <div
+              onClick={() =>
+                setCurrentConversation({
+                  _id: null,
+                  members: [friend._id, user._id],
+                })
+              }
+            >
+              <User user={friend} />
+            </div>
+          ))}
+        </>
+      );
+    } else if (searchConversations.length > 0) {
+      return (
+        <>
+          <div className="tab">Chats</div>
+          {searchConversations.map((c) => (
+            <div onClick={() => setCurrentConversation(c)}>
+              <Conversation
+                conversation={c}
+                currentUser={user}
+                gotMessage={gotMessage}
+              />
+            </div>
+          ))}
+        </>
+      );
+    } else if (usersNoConversationsFound.length > 0) {
+      return (
+        <>
+          <div className="tab">Friends</div>
+          {usersNoConversationsFound.map((friend) => (
+            <div
+              onClick={() =>
+                setCurrentConversation({
+                  _id: null,
+                  members: [friend._id, user._id],
+                })
+              }
+            >
+              <User user={friend} />
+            </div>
+          ))}
+        </>
+      );
+    } else {
+      return null;
+    }
+  };
   return (
     <div className="container h-100">
       <div className="row no-gutters ">
@@ -201,34 +293,17 @@ export default function Chat({ user, setUser }) {
             </div>
           </div>
           <div className="conversations-container bg-white ">
-            {usersWithConversationsFound.length > 0
-              ? isSearching && <div>Chats</div>
-              : null}
             {isSearching
-              ? // Displaying exist chats
-                usersWithConversationsFound.map((user) => (
-                  <div>
-                    <User user={user} />
-                  </div>
-                ))
+              ? searchInProgress()
               : conversations.map((c) => (
                   <div onClick={() => setCurrentConversation(c)}>
-                    <Conversation conversation={c} currentUser={user} />
+                    <Conversation
+                      conversation={c}
+                      currentUser={user}
+                      gotMessage={gotMessage}
+                    />
                   </div>
                 ))}
-
-            {usersNoConversationsFound.length > 0
-              ? isSearching && <div>Friends</div>
-              : null}
-
-            {isSearching
-              ? // Displaying non exist chats
-                usersNoConversationsFound.map((user) => (
-                  <div>
-                    <User user={user} />
-                  </div>
-                ))
-              : null}
           </div>
         </div>
 

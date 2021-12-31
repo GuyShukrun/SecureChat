@@ -124,3 +124,9 @@
   display: table;
   margin: 50px auto;
 }
+.tab {
+  margin: 0px;
+  padding: 7px;
+
+  font-weight: 500;
+}
