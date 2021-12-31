@@ -75,7 +75,7 @@ export default function Chat({ user, setUser }) {
     socket.current = io("ws://localhost:8900");
     socket.current.on("getMessage", (data) => {
       setArrivalMessage({
-        conversations: data.conversation,
+        conversation: data.conversation,
         sender: data.senderId,
         text: data.text,
         createdAt: Date.now(),
@@ -92,10 +92,21 @@ export default function Chat({ user, setUser }) {
 
   useEffect(() => {
     if (arrivalMessage) {
-      setGotMessage(!gotMessage);
-      if (!conversations.includes(arrivalMessage.conversation)) {
-        conversations.unshift(arrivalMessage.conversation);
-        setConversations(conversations);
+      if (
+        arrivalMessage.conversation &&
+        !conversations.includes(arrivalMessage.conversation)
+      ) {
+        setConversations([]);
+        setTimeout(() => {
+          let conv = [arrivalMessage.conversation, ...conversations];
+          setConversations(conv);
+        }, 200);
+      } else {
+        console.log("got in2");
+        // let conv = [...conversations];
+        // setConversations([]);
+        // setConversations(conv);
+        setGotMessage(!gotMessage);
       }
     }
   }, [arrivalMessage]);
@@ -168,33 +179,47 @@ export default function Chat({ user, setUser }) {
         sender: user._id,
         text: message.current.value,
       };
+      // TODO: merge the code together
+      let newConversation = null;
       try {
-        let conversationNew;
         if (!newMessage.conversationId) {
           const res = await axios.post(
             "http://localhost:8800/api/conversations",
             { senderId: user._id, receiverId: friend._id }
           );
-          conversationNew = res.data;
-          setCurrentConversation(res.data);
+
           conversations.unshift(res.data);
+          searchConversations.unshift(res.data);
+          const cloneConversations = [...searchConversations];
+          setSearchConversations([]);
+          setSearchConversations(cloneConversations);
+
+          let cloneUsers = [...usersNoConversationsFound];
+          cloneUsers = cloneUsers.filter((user1) => user1._id !== friend._id);
+          setUsersNoConversationsFound([]);
+          setUsersNoConversationsFound(cloneUsers);
           setConversations(conversations);
           newMessage.conversationId = res.data._id;
+          newConversation = res.data;
         }
 
         const res = await axios.post(
           "http://localhost:8800/api/messages/",
           newMessage
         );
-        setMessages([...messages, res.data]);
-        message.current.value = "";
         setGotMessage(!gotMessage);
+        setMessages([...messages, res.data]);
+
+        if (newConversation) setCurrentConversation(newConversation);
+
         socket.current.emit("sendMessage", {
-          conversation: conversationNew,
+          conversation: newConversation,
           senderId: user._id,
           receiverId: friend._id,
           text: message.current.value,
         });
+
+        message.current.value = "";
       } catch (error) {
         console.log(error);
       }
@@ -211,7 +236,11 @@ export default function Chat({ user, setUser }) {
           <div className="tab">Chats</div>
           {searchConversations.map((c) => (
             <div onClick={() => setCurrentConversation(c)}>
-              <Conversation conversation={c} currentUser={user} />
+              <Conversation
+                conversation={c}
+                currentUser={user}
+                gotMessage={gotMessage}
+              />
             </div>
           ))}
           <div className="tab">Friends</div>
