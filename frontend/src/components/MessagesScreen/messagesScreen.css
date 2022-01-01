@@ -1,0 +1,21 @@
+.chat-panel {
+  height: calc(100vh - 200px);
+  width: 100%;
+  background: white;
+  overflow-y: scroll;
+}
+
+.chat-panel::-webkit-scrollbar {
+  width: 7px;
+}
+
+.chat-panel::-webkit-scrollbar-thumb {
+  background: #eee;
+}
+
+.chat-panel::-webkit-scrollbar-track {
+  background: #fafafa;
+}
+.chat-panel .col-4 {
+  background: white;
+}

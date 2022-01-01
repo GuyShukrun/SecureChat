@@ -2,7 +2,6 @@ import React from "react";
 import "./chat.css";
 import { useRef, useEffect, useState } from "react";
 import LogoutIcon from "@mui/icons-material/Logout";
-import MenuIcon from "@mui/icons-material/Menu";
 import SearchIcon from "@mui/icons-material/Search";
 import SendIcon from "@mui/icons-material/Send";
 import Message from "../../components/Message/Message";
@@ -10,6 +9,8 @@ import axios from "axios";
 import { io, Socket } from "socket.io-client";
 import Conversation from "../../components/Conversation/Conversation";
 import User from "../../components/User/User";
+import ContactsScreen from "../../components/ContactsScreen/ContactsScreen";
+import ChatScreen from "../../components/ChatScreen/ChatScreen";
 export default function Chat({ user, setUser }) {
   const PF = process.env.REACT_APP_PUBLIC_FOLDER;
   const [conversations, setConversations] = useState([]);
@@ -35,39 +36,39 @@ export default function Chat({ user, setUser }) {
     localStorage.clear();
   };
 
-  const handleSearch = async () => {
-    if (search.current.value) {
-      setIsSearching(true);
-      setSearchConversations([]);
+  // const handleSearch = async () => {
+  //   if (search.current.value) {
+  //     setIsSearching(true);
+  //     setSearchConversations([]);
 
-      try {
-        const res = await axios.get(
-          "http://localhost:8800/api/users/search/" + search.current.value
-        );
-        const usersWithConversation = res.data.filter(
-          (user2) =>
-            user2._id !== user._id &&
-            conversations.some((c) => c.members.includes(user2._id))
-        );
-        const usersWithoutConversations = res.data.filter(
-          (user2) =>
-            user._id != user2._id && !usersWithConversation.includes(user2)
-        );
+  //     try {
+  //       const res = await axios.get(
+  //         "http://localhost:8800/api/users/search/" + search.current.value
+  //       );
+  //       const usersWithConversation = res.data.filter(
+  //         (user2) =>
+  //           user2._id !== user._id &&
+  //           conversations.some((c) => c.members.includes(user2._id))
+  //       );
+  //       const usersWithoutConversations = res.data.filter(
+  //         (user2) =>
+  //           user._id != user2._id && !usersWithConversation.includes(user2)
+  //       );
 
-        const conversationsSearch = conversations.filter((c) =>
-          usersWithConversation.some((user2) => c.members.includes(user2._id))
-        );
-        setSearchConversations(conversationsSearch);
-        setUsersNoConversationsFound(usersWithoutConversations);
-      } catch (error) {
-        console.log(error);
-      }
-    } else {
-      setUsersNoConversationsFound([]);
-      setSearchConversations([]);
-      setIsSearching(false);
-    }
-  };
+  //       const conversationsSearch = conversations.filter((c) =>
+  //         usersWithConversation.some((user2) => c.members.includes(user2._id))
+  //       );
+  //       setSearchConversations(conversationsSearch);
+  //       setUsersNoConversationsFound(usersWithoutConversations);
+  //     } catch (error) {
+  //       console.log(error);
+  //     }
+  //   } else {
+  //     setUsersNoConversationsFound([]);
+  //     setSearchConversations([]);
+  //     setIsSearching(false);
+  //   }
+  // };
 
   // Set socket on first render
   // Set behavior on getting message
@@ -119,57 +120,57 @@ export default function Chat({ user, setUser }) {
   }, [user]);
 
   // Get conversations useEffect
-  useEffect(() => {
-    const getConversations = async () => {
-      try {
-        const res = await axios.get(
-          "http://localhost:8800/api/conversations/" + user._id
-        );
-        setConversations(res.data);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    getConversations();
-  }, []);
+  // useEffect(() => {
+  //   const getConversations = async () => {
+  //     try {
+  //       const res = await axios.get(
+  //         "http://localhost:8800/api/conversations/" + user._id
+  //       );
+  //       setConversations(res.data);
+  //     } catch (error) {
+  //       console.log(error);
+  //     }
+  //   };
+  //   getConversations();
+  // }, []);
 
   // Get messages of current conversation
-  useEffect(() => {
-    const getMessages = async () => {
-      try {
-        const res = await axios.get(
-          "http://localhost:8800/api/messages/" + currentConversation._id
-        );
-        setMessages(res.data);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    getMessages();
-  }, [currentConversation]);
+  // useEffect(() => {
+  //   const getMessages = async () => {
+  //     try {
+  //       const res = await axios.get(
+  //         "http://localhost:8800/api/messages/" + currentConversation._id
+  //       );
+  //       setMessages(res.data);
+  //     } catch (error) {
+  //       console.log(error);
+  //     }
+  //   };
+  //   getMessages();
+  // }, [currentConversation]);
 
   // Scroll smoothly to the last message if there is scroll-y
-  useEffect(() => {
-    scrollRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  // useEffect(() => {
+  //   scrollRef.current?.scrollIntoView({ behavior: "smooth" });
+  // }, [messages]);
 
   // Fetch user accodrding to current chat
-  useEffect(() => {
-    const getFriend = async () => {
-      const friendId = currentConversation.members.find(
-        (member) => member !== user._id
-      );
-      try {
-        const res = await axios.get(
-          "http://localhost:8800/api/users?userId=" + friendId
-        );
-        setFriend(res.data);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    if (currentConversation) getFriend();
-  }, [currentConversation]);
+  // useEffect(() => {
+  //   const getFriend = async () => {
+  //     const friendId = currentConversation.members.find(
+  //       (member) => member !== user._id
+  //     );
+  //     try {
+  //       const res = await axios.get(
+  //         "http://localhost:8800/api/users?userId=" + friendId
+  //       );
+  //       setFriend(res.data);
+  //     } catch (error) {
+  //       console.log(error);
+  //     }
+  //   };
+  //   if (currentConversation) getFriend();
+  // }, [currentConversation]);
 
   // Handling send message
   const handleSendMessage = async () => {
@@ -299,7 +300,7 @@ export default function Chat({ user, setUser }) {
     <div className="container h-100">
       <div className="row no-gutters ">
         <div className="col-4 border-right">
-          <div className="settings-tray">
+          {/* <div className="settings-tray">
             <img
               className="rounded-circle profile-img"
               src={PF + "/" + user.profilePicture}
@@ -333,11 +334,23 @@ export default function Chat({ user, setUser }) {
                     />
                   </div>
                 ))}
-          </div>
+          </div> */}
+
+          <ContactsScreen
+            socket={socket}
+            user={user}
+            setUser={setUser}
+            setCurrentConversation={setCurrentConversation}
+          />
         </div>
 
         <div className="col-8 ">
-          {currentConversation ? (
+          <ChatScreen
+            currentConversation={currentConversation}
+            user={user}
+            socket={socket}
+          />
+          {/* {currentConversation ? (
             <>
               <div className="upper-chat ">
                 <img
@@ -376,7 +389,7 @@ export default function Chat({ user, setUser }) {
             <span className="noConversationText">
               Open a conversation to start a chat or search for new friends!
             </span>
-          )}
+          )} */}
         </div>
       </div>{" "}
       {/* row end*/}

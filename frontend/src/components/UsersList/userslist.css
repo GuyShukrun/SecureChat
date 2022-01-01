@@ -1,8 +1,9 @@
-.search-box {
-  background: #fafafa;
-  padding: 10px 13px;
-}
+.tab {
+  margin: 0px;
+  padding: 7px;
 
+  font-weight: 500;
+}
 .conversations-container {
   height: calc(100vh - 200px) !important;
   overflow-y: scroll;
@@ -18,20 +19,4 @@
 
 .conversations-container::-webkit-scrollbar-track {
   background: #fafafa;
-}
-
-.upper-chat {
-  background: #eee;
-  padding: 10px 15px;
-  border-radius: 7px;
-  display: flex;
-  float: left;
-  width: 100%;
-  align-items: center;
-}
-
-.user-fullname-upper-chat {
-  background: #eee;
-  margin-top: 7px;
-  margin-left: 10px;
 }
