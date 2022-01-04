@@ -5,14 +5,27 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import axios from "axios";
 import "./contactsScreen.css";
 
-function ContactsScreen({ socket, user, setUser, setCurrentConversation }) {
+function ContactsScreen({
+  socket,
+  user,
+  setUser,
+  setCurrentConversation,
+  lastMessage,
+  setLastMessage,
+  arrivalMessage,
+  conversations,
+  setConversations,
+  searchConversations,
+  setSearchConversations,
+  usersNoConversationsFound,
+  setUsersNoConversationsFound,
+}) {
   const PF = process.env.REACT_APP_PUBLIC_FOLDER;
   const [isSearching, setIsSearching] = useState(false);
-  const [usersNoConversationsFound, setUsersNoConversationsFound] = useState(
-    []
-  );
-  const [searchConversations, setSearchConversations] = useState([]);
-  const [conversations, setConversations] = useState([]);
+  // const [usersNoConversationsFound, setUsersNoConversationsFound] = useState(
+  //   []
+  // );
+  // const [searchConversations, setSearchConversations] = useState([]);
 
   // Get conversations useEffect on first render
   useEffect(() => {
@@ -58,7 +71,11 @@ function ContactsScreen({ socket, user, setUser, setCurrentConversation }) {
         conversations={conversations}
         usersNoConversationsFound={usersNoConversationsFound}
         searchConversations={searchConversations}
+        setConversations={setConversations}
         user={user}
+        lastMessage={lastMessage}
+        setLastMessage={setLastMessage}
+        arrivalMessage={arrivalMessage}
       />
     </>
   );

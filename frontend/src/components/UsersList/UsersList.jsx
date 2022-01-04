@@ -1,19 +1,39 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Conversation from "../Conversation/Conversation";
 import User from "../User/User";
-
+import axios from "axios";
 import "./userslist.css";
 
 function UsersList({
   setCurrentConversation,
   isSearching,
-
+  lastMessage,
   conversations,
   usersNoConversationsFound,
   searchConversations,
   user,
+  setLastMessage,
+  arrivalMessage,
+  setConversations,
 }) {
-  const [gotMessage, setGotMessage] = useState(false);
+  // If a user get message and he doesnt own the converstion, means it's new conversation, add the conversation to his converation list
+  useEffect(() => {
+    const getConvesationAccordingToMessage = async () => {
+      if (
+        arrivalMessage &&
+        !conversations.some((c) => c._id === arrivalMessage.conversation._id)
+      ) {
+        const res = await axios(
+          "http://localhost:8800/api/conversations/" + user._id
+        );
+        // setConversations([]);
+        setConversations(res.data);
+      }
+    };
+
+    getConvesationAccordingToMessage();
+  }, [arrivalMessage]);
+
   const searchInProgress = () => {
     if (
       searchConversations.length > 0 &&
@@ -23,18 +43,24 @@ function UsersList({
         <>
           <div className="tab">Chats</div>
           {searchConversations.map((c, key) => (
-            <div key={key} onClick={() => setCurrentConversation(c)}>
+            <div
+              key={c.members.find((mem) => mem !== user._id)}
+              onClick={() => setCurrentConversation(c)}
+            >
               <Conversation
+                key={c.members.find((mem) => mem !== user._id)}
                 conversation={c}
                 currentUser={user}
-                gotMessage={gotMessage}
+                setLastMessage={setLastMessage}
+                lastMessage={lastMessage}
+                arrivalMessage={arrivalMessage}
               />
             </div>
           ))}
           <div className="tab">Friends</div>
           {usersNoConversationsFound.map((friend, key) => (
             <div
-              key={key}
+              key={friend._id}
               onClick={() =>
                 setCurrentConversation({
                   _id: null,
@@ -42,7 +68,7 @@ function UsersList({
                 })
               }
             >
-              <User user={friend} />
+              <User key={friend._id} user={friend} />
             </div>
           ))}
         </>
@@ -52,11 +78,17 @@ function UsersList({
         <>
           <div className="tab">Chats</div>
           {searchConversations.map((c, key) => (
-            <div key={key} onClick={() => setCurrentConversation(c)}>
+            <div
+              key={c.members.find((mem) => mem !== user._id)}
+              onClick={() => setCurrentConversation(c)}
+            >
               <Conversation
+                key={c.members.find((mem) => mem !== user._id)}
                 conversation={c}
                 currentUser={user}
-                gotMessage={gotMessage}
+                lastMessage={lastMessage}
+                setLastMessage={setLastMessage}
+                arrivalMessage={arrivalMessage}
               />
             </div>
           ))}
@@ -68,7 +100,7 @@ function UsersList({
           <div className="tab">Friends</div>
           {usersNoConversationsFound.map((friend, key) => (
             <div
-              key={key}
+              key={friend._id}
               onClick={() =>
                 setCurrentConversation({
                   _id: null,
@@ -76,7 +108,7 @@ function UsersList({
                 })
               }
             >
-              <User user={friend} />
+              <User key={friend._id} user={friend} />
             </div>
           ))}
         </>
@@ -91,11 +123,17 @@ function UsersList({
       {isSearching
         ? searchInProgress()
         : conversations.map((c, key) => (
-            <div key={key} onClick={() => setCurrentConversation(c)}>
+            <div
+              key={c.members.find((mem) => mem !== user._id)}
+              onClick={() => setCurrentConversation(c)}
+            >
               <Conversation
+                key={c.members.find((mem) => mem !== user._id)}
                 conversation={c}
                 currentUser={user}
-                gotMessage={gotMessage}
+                lastMessage={lastMessage}
+                setLastMessage={setLastMessage}
+                arrivalMessage={arrivalMessage}
               />
             </div>
           ))}

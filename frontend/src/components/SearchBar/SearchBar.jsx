@@ -47,6 +47,10 @@ function SearchBar({
     }
   };
 
+  // useEffect(()=>{
+  //   if (newChat)
+  //   setSearchConversations([res.data,...searchConversations]);
+  // },[newChat])
   return (
     <div className="search-box">
       <div className="input-group rounded">

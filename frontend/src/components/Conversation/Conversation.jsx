@@ -5,12 +5,13 @@ import "./conversation.css";
 export default function Conversation({
   conversation,
   currentUser,
-  gotMessage,
+  lastMessage,
+  setLastMessage,
+  arrivalMessage,
 }) {
   const PF = process.env.REACT_APP_PUBLIC_FOLDER;
-
+  const [ownLastMessage, setOwnLastMessage] = useState(null);
   const [user, setUser] = useState(null);
-  const [lastMessage, setLastMessage] = useState(null);
   useEffect(() => {
     const friendId = conversation.members.find((m) => m !== currentUser._id);
     const getUser = async () => {
@@ -26,6 +27,7 @@ export default function Conversation({
     getUser();
   }, []);
 
+  // Get last message when first render
   useEffect(() => {
     const getLastMessage = async () => {
       try {
@@ -33,13 +35,30 @@ export default function Conversation({
           "http://localhost:8800/api/messages/lastMessage/" + conversation._id
         );
         setLastMessage(res.data);
+        setOwnLastMessage(res.data);
       } catch (error) {
         console.log(error);
       }
     };
     getLastMessage();
-  }, [gotMessage]);
-  if (user === null || lastMessage === null) return null;
+  }, []);
+
+  // Changes own state of last message only if the message is related to this conversation!
+  useEffect(() => {
+    if (lastMessage?.conversationId === conversation._id) {
+      setOwnLastMessage(lastMessage);
+    }
+  }, [lastMessage]);
+
+  // Change own state of last message if I got message through the socket
+
+  useEffect(() => {
+    arrivalMessage &&
+      arrivalMessage.conversation._id === conversation._id &&
+      setOwnLastMessage(arrivalMessage);
+  }, [arrivalMessage]);
+
+  if (user === null || ownLastMessage === null) return null;
   else
     return (
       <>
@@ -52,11 +71,11 @@ export default function Conversation({
           <div className="conversation-user-text bg-white ">
             <h6 className="bg-white user-fullname">{user?.fullname}</h6>
             <p className="text-muted bg-white message-preview">
-              {lastMessage?.text}
+              {ownLastMessage?.text}
             </p>
           </div>
           <span className="time text-muted small bg-white float-right">
-            {new Date(lastMessage?.createdAt).toLocaleTimeString("en-il", {
+            {new Date(ownLastMessage?.createdAt).toLocaleTimeString("en-il", {
               hour: "2-digit",
               minute: "2-digit",
             })}

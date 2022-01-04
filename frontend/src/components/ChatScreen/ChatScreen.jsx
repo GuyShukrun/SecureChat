@@ -3,7 +3,20 @@ import InputMessage from "../InputMessage/InputMessage";
 import MessagesScreen from "../MessagesScreen/MessagesScreen";
 import axios from "axios";
 import "./chatScreen.css";
-function ChatScreen({ currentConversation, user, socket }) {
+function ChatScreen({
+  currentConversation,
+  user,
+  socket,
+  arrivalMessage,
+  setLastMessage,
+  conversations,
+  setConversations,
+  searchConversations,
+  setSearchConversations,
+  usersNoConversationsFound,
+  setUsersNoConversationsFound,
+  setCurrentConversation,
+}) {
   const PF = process.env.REACT_APP_PUBLIC_FOLDER;
   const [friend, setFriend] = useState(null);
   const [messages, setMessages] = useState([]);
@@ -41,6 +54,14 @@ function ChatScreen({ currentConversation, user, socket }) {
     }
   }, [currentConversation]);
 
+  // if arrivalMessage is not null and it's from the sender, expand the messages..
+
+  useEffect(() => {
+    arrivalMessage &&
+      currentConversation?.members.includes(arrivalMessage.sender) &&
+      setMessages((prev) => [...prev, arrivalMessage]);
+  }, [arrivalMessage]);
+
   if (currentConversation && friend) {
     return (
       <>
@@ -59,6 +80,15 @@ function ChatScreen({ currentConversation, user, socket }) {
           currentConversation={currentConversation}
           user={user}
           socket={socket}
+          friend={friend}
+          setLastMessage={setLastMessage}
+          conversations={conversations}
+          setConversations={setConversations}
+          searchConversations={searchConversations}
+          setSearchConversations={setSearchConversations}
+          usersNoConversationsFound={usersNoConversationsFound}
+          setUsersNoConversationsFound={setUsersNoConversationsFound}
+          setCurrentConversation={setCurrentConversation}
         />
       </>
     );
