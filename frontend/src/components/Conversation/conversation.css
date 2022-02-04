@@ -16,9 +16,16 @@
 .conversation:hover .conversation-user-text,
 .conversation:hover .time,
 .conversation:hover .message-preview,
-.conversation:hover .user-fullname {
+.conversation:hover .user-fullname,
+.conversation:hover .time-message-counter {
   transition: 0.3s ease;
   background: #74b9ff !important;
+  color: #fff !important;
+}
+
+.conversation:hover .message-counter {
+  transition: 0.3s ease;
+  background: #60a9f1 !important;
   color: #fff !important;
 }
 
@@ -48,6 +55,7 @@
   margin: 0;
   overflow: hidden !important;
   text-overflow: ellipsis;
+  float: left;
 }
 
 hr {
@@ -56,4 +64,18 @@ hr {
   margin-top: 3% !important;
   margin-bottom: 3% !important; */
   width: 60%;
+}
+
+.message-counter {
+  text-align: center;
+  float: right;
+  width: 25px;
+  height: 25px;
+  margin-top: 15px;
+}
+
+.time-message-counter {
+  /* display: inline-block; */
+  width: 35px;
+  height: 70%;
 }

@@ -6,6 +6,7 @@ import axios from "axios";
 import "./contactsScreen.css";
 
 function ContactsScreen({
+  currentConversation,
   socket,
   user,
   setUser,
@@ -66,6 +67,7 @@ function ContactsScreen({
         conversations={conversations}
       />
       <UsersList
+        currentConversation={currentConversation}
         setCurrentConversation={setCurrentConversation}
         isSearching={isSearching}
         conversations={conversations}

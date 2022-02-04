@@ -33,7 +33,12 @@ function InputMessage({
         if (!newMessage.conversationId) {
           const res = await axios.post(
             "http://localhost:8800/api/conversations",
-            { senderId: user._id, receiverId: friend._id }
+            {
+              senderId: user._id,
+              receiverId: friend._id,
+              messageCounterMember1: 0,
+              messageCounterMember2: 1,
+            }
           );
           setConversations([res.data, ...conversations]);
           let copy = searchConversations;
@@ -47,12 +52,17 @@ function InputMessage({
           newMessage.conversationId = res.data._id;
           // newConversation = res.data;
         }
-
+        // post new message
         const res = await axios.post(
           "http://localhost:8800/api/messages/",
           newMessage
         );
 
+        //Update current conversation last message for displaying!
+        const res2 = await axios.put(
+          "http://localhost:8800/api/conversations/" + newConversation._id,
+          { lastMessage: newMessage.text }
+        );
         // setGotMessage(!gotMessage);
         setMessages([...messages, res.data]);
         setLastMessage(res.data);

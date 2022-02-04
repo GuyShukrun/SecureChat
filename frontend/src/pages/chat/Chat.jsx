@@ -140,6 +140,7 @@ export default function Chat({ user, setUser }) {
             setSearchConversations={setSearchConversations}
             usersNoConversationsFound={usersNoConversationsFound}
             setUsersNoConversationsFound={setUsersNoConversationsFound}
+            currentConversation={currentConversation}
           />
         </div>
 

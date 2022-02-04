@@ -15,6 +15,7 @@ function UsersList({
   setLastMessage,
   arrivalMessage,
   setConversations,
+  currentConversation,
 }) {
   // If a user get message and he doesnt own the converstion, means it's new conversation, add the conversation to his converation list
   useEffect(() => {
@@ -28,11 +29,33 @@ function UsersList({
         );
         // setConversations([]);
         setConversations(res.data);
+      } else if (arrivalMessage) {
+        let conv = conversations.find(
+          (c) => c._id === arrivalMessage.conversation._id
+        );
+        let convs = conversations.filter(
+          (c) => c._id !== arrivalMessage.conversation._id
+        );
+
+        setConversations([conv, ...convs]);
       }
     };
 
     getConvesationAccordingToMessage();
   }, [arrivalMessage]);
+
+  useEffect(() => {
+    if (lastMessage) {
+      let conv = conversations.find(
+        (c) => c._id === lastMessage?.conversationId
+      );
+      let convs = conversations.filter(
+        (c) => c._id !== lastMessage?.conversationId
+      );
+
+      setConversations([conv, ...convs]);
+    }
+  }, [lastMessage]);
 
   const searchInProgress = () => {
     if (
@@ -54,6 +77,7 @@ function UsersList({
                 setLastMessage={setLastMessage}
                 lastMessage={lastMessage}
                 arrivalMessage={arrivalMessage}
+                currentConversation={currentConversation}
               />
             </div>
           ))}
@@ -89,6 +113,7 @@ function UsersList({
                 lastMessage={lastMessage}
                 setLastMessage={setLastMessage}
                 arrivalMessage={arrivalMessage}
+                currentConversation={currentConversation}
               />
             </div>
           ))}
@@ -134,6 +159,7 @@ function UsersList({
                 lastMessage={lastMessage}
                 setLastMessage={setLastMessage}
                 arrivalMessage={arrivalMessage}
+                currentConversation={currentConversation}
               />
             </div>
           ))}

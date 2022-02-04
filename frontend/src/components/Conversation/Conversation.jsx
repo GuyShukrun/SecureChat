@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import "./conversation.css";
@@ -8,12 +8,43 @@ export default function Conversation({
   lastMessage,
   setLastMessage,
   arrivalMessage,
+  currentConversation,
 }) {
   const PF = process.env.REACT_APP_PUBLIC_FOLDER;
   const [ownLastMessage, setOwnLastMessage] = useState(null);
-  const [user, setUser] = useState(null);
+  const [messageCounter, setMessageCounter] = useState(0);
+  const [user, setUser] = useState(null); // Friend user
+  const ownIndex = conversation.members.indexOf(currentUser._id);
+
+  // Function to update message counter in the DB
+  const updateMessageCounter = async (count) => {
+    try {
+      if (ownIndex === 0) {
+        const res = await axios.put(
+          "http://localhost:8800/api/conversations/" + conversation._id,
+          {
+            messageCounterMember1: `${count}`,
+          }
+        );
+      } else {
+        const res = await axios.put(
+          "http://localhost:8800/api/conversations/" + conversation._id,
+          {
+            messageCounterMember2: `${count}`,
+          }
+        );
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  // On first render - we get the user we talk to, last message and message counter
   useEffect(() => {
     const friendId = conversation.members.find((m) => m !== currentUser._id);
+
+    ownIndex === 0
+      ? setMessageCounter(conversation.messageCounterMember1)
+      : setMessageCounter(conversation.messageCounterMember2);
     const getUser = async () => {
       try {
         const res = await axios(
@@ -27,14 +58,14 @@ export default function Conversation({
     getUser();
   }, []);
 
-  // Get last message when first render
+  //Get last message when first render
   useEffect(() => {
     const getLastMessage = async () => {
       try {
         const res = await axios(
           "http://localhost:8800/api/messages/lastMessage/" + conversation._id
         );
-        setLastMessage(res.data);
+        // setLastMessage(res.data);
         setOwnLastMessage(res.data);
       } catch (error) {
         console.log(error);
@@ -50,13 +81,59 @@ export default function Conversation({
     }
   }, [lastMessage]);
 
+  // reset message counter , change the value in the DB aswell
+  useEffect(() => {
+    if (currentConversation && currentConversation._id === conversation._id) {
+      updateMessageCounter("0");
+      setMessageCounter(0);
+    }
+  }, [currentConversation]);
+
+  // if messageCounter changes, change the value in the DB aswell
+  useEffect(() => {
+    if (ownIndex === 0) {
+      axios
+        .put("http://localhost:8800/api/conversations/" + conversation._id, {
+          messageCounterMember1: `${messageCounter}`,
+        })
+        .then((res) => console.log(res))
+        .catch((err) => console.log(err));
+    } else {
+      axios
+        .put("http://localhost:8800/api/conversations/" + conversation._id, {
+          messageCounterMember2: `${messageCounter}`,
+        })
+        .then((res) => console.log(res))
+        .catch((err) => console.log(err));
+    }
+  }, [messageCounter]);
   // Change own state of last message if I got message through the socket
 
   useEffect(() => {
-    arrivalMessage &&
-      arrivalMessage.conversation._id === conversation._id &&
+    if (arrivalMessage && arrivalMessage.conversation._id === conversation._id)
       setOwnLastMessage(arrivalMessage);
+
+    if (
+      (arrivalMessage &&
+        arrivalMessage.conversation._id === conversation._id &&
+        currentConversation &&
+        currentConversation._id !== conversation._id) ||
+      (arrivalMessage &&
+        arrivalMessage.conversation._id === conversation._id &&
+        !currentConversation)
+    ) {
+      updateMessageCounter(messageCounter + 1);
+      setMessageCounter(messageCounter + 1);
+    }
   }, [arrivalMessage]);
+
+  const handleMessageCounter = () => {
+    if (messageCounter && messageCounter !== 0)
+      return (
+        <span className="rounded-circle message-counter">{messageCounter}</span>
+      );
+    else return null;
+  };
 
   if (user === null || ownLastMessage === null) return null;
   else
@@ -70,16 +147,21 @@ export default function Conversation({
           />
           <div className="conversation-user-text bg-white ">
             <h6 className="bg-white user-fullname">{user?.fullname}</h6>
+
             <p className="text-muted bg-white message-preview">
               {ownLastMessage?.text}
             </p>
           </div>
-          <span className="time text-muted small bg-white float-right">
-            {new Date(ownLastMessage?.createdAt).toLocaleTimeString("en-il", {
-              hour: "2-digit",
-              minute: "2-digit",
-            })}
-          </span>
+
+          <div className="bg-white time-message-counter">
+            <span className="time text-muted small bg-white float-right">
+              {new Date(ownLastMessage?.createdAt).toLocaleTimeString("en-il", {
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+            </span>
+            {handleMessageCounter()}
+          </div>
         </div>
         <hr />
       </>
