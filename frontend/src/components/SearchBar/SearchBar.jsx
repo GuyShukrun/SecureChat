@@ -34,7 +34,7 @@ function SearchBar({
         );
         const usersWithoutConversations = res.data.filter(
           (user2) =>
-            user._id != user2._id && !usersWithConversation.includes(user2)
+            user._id !== user2._id && !usersWithConversation.includes(user2)
         );
 
         const conversationsSearch = conversations.data.filter((c) =>

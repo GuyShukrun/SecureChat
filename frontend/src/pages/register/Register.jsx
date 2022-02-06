@@ -20,24 +20,6 @@ export default function Register() {
   };
   const handleRegister = (e) => {
     e.preventDefault();
-    // console.log(profileImg);
-
-    // const formData = new FormData();
-    // // Appending all the key-value pairs for registration test
-    // formData.append("profileImg", profileImg);
-    // formData.append("email", email.current.value);
-    // formData.append("fullname", fullname.current.value);
-    // formData.append("password", password.current.value);
-
-    // axios
-    //   .post("http://localhost:8800/api/users/register", formData, {})
-    //   .then((res) => {
-    //     navigate("/login");
-    //     // console.log(res);
-    //   });
-
-    // profile image is chosen!
-
     if (profileImg) {
       const storageRef = ref(storage, `/images/${profileImg.name}`);
       const uploadTask = uploadBytesResumable(storageRef, profileImg);
@@ -57,32 +39,41 @@ export default function Register() {
                 profilePicture: url,
               };
               return axios.post(
-                "http://localhost:8800/api/users/registerv2",
+                "http://localhost:8800/api/users/register",
                 userCredentials
               );
             })
             .then((res) => {
               navigate("/login");
             })
-            .catch((err) => alert(err));
+            .catch((err) => alert("Something went wrong, please try again"));
         }
       );
     }
 
     // No profile image selected
     else {
+      if (password.current.value.length < 6) {
+        alert("Password length must be at least 6 characters");
+        return;
+      }
+      if (fullname.current.value.length < 1) {
+        alert("Full name length must be at least 1 character");
+        return;
+      }
+
       let userCredentials = {
         email: email.current.value,
         password: password.current.value,
         fullname: fullname.current.value,
-        profileImg: noAvatarUrl,
+        profilePicture: noAvatarUrl,
       };
       axios
         .post("http://localhost:8800/api/users/register", userCredentials)
         .then((res) => {
           navigate("/login");
         })
-        .catch((err) => alert(err));
+        .catch((err) => alert("Something went wrong, please try again"));
     }
   };
   return (
@@ -94,6 +85,7 @@ export default function Register() {
             <img
               src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/draw2.svg"
               className="img-fluid"
+              alt=""
             />
           </div>
           <div className="col ">
@@ -106,6 +98,7 @@ export default function Register() {
                   ref={fullname}
                   className="form-control"
                   placeholder="Full name"
+                  pattern=".{1,}"
                 />
               </div>
               <div className="form-group mt-2">
@@ -128,7 +121,11 @@ export default function Register() {
                   ref={password}
                   className="form-control"
                   placeholder="Password"
+                  pattern=".{6,}"
                 />
+                <small id="emailHelp" className="form-text text-muted">
+                  Password length must be at least 6 characters.
+                </small>
               </div>
               <div class="form-group mt-2">
                 <label className="mb-2">Choose Profile Picture</label>

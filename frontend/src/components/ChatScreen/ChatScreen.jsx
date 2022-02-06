@@ -17,7 +17,6 @@ function ChatScreen({
   setUsersNoConversationsFound,
   setCurrentConversation,
 }) {
-  const PF = process.env.REACT_APP_PUBLIC_FOLDER;
   const [friend, setFriend] = useState(null);
   const [messages, setMessages] = useState([]);
 

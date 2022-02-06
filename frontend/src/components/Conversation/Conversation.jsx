@@ -10,7 +10,6 @@ export default function Conversation({
   arrivalMessage,
   currentConversation,
 }) {
-  const PF = process.env.REACT_APP_PUBLIC_FOLDER;
   const [ownLastMessage, setOwnLastMessage] = useState(null);
   const [messageCounter, setMessageCounter] = useState(0);
   const [user, setUser] = useState(null); // Friend user
@@ -21,14 +20,14 @@ export default function Conversation({
   const updateMessageCounter = async (count) => {
     try {
       if (ownIndex === 0) {
-        const res = await axios.put(
+        await axios.put(
           "http://localhost:8800/api/conversations/" + conversation._id,
           {
             messageCounterMember1: `${count}`,
           }
         );
       } else {
-        const res = await axios.put(
+        await axios.put(
           "http://localhost:8800/api/conversations/" + conversation._id,
           {
             messageCounterMember2: `${count}`,

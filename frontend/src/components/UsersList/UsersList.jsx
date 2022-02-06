@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import Conversation from "../Conversation/Conversation";
 import User from "../User/User";
 import axios from "axios";

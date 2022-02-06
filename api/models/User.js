@@ -21,22 +21,6 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
-    friends: {
-      type: Array,
-      default: [],
-    },
-    isAdmin: {
-      type: Boolean,
-      default: false,
-    },
-    isOnline: {
-      type: Boolean,
-      default: false,
-    },
-    messages: {
-      type: Array,
-      default: [],
-    },
   },
   { timestamps: true }
 );

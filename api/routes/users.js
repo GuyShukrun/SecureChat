@@ -1,40 +1,11 @@
 const express = require("express");
 const router = express.Router();
-const storageRef = require("../index");
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
 const User = require("../models/User");
-const multer = require("multer");
-const { v4: uuidv4 } = require("uuid");
 //CRUD
 
-// const storage = multer.diskStorage({
-//   destination: (req, file, cb) => {
-//     cb(null, "../frontend/public/uploads");
-//   },
-//   filename: (req, file, cb) => {
-//     const fileName = file.originalname.toLowerCase().split(" ").join("-");
-//     cb(null, uuidv4() + "-" + fileName);
-//   },
-// });
-
-// const upload = multer({
-//   storage: storage,
-//   fileFilter: (req, file, cb) => {
-//     if (
-//       file.mimetype == "image/png" ||
-//       file.mimetype == "image/jpg" ||
-//       file.mimetype == "image/jpeg"
-//     ) {
-//       cb(null, true);
-//     } else {
-//       cb(null, false);
-//       return cb(new Error("Only .png, .jpg and .jpeg format allowed!"));
-//     }
-//   },
-// });
-
-router.post("/registerv2", async (req, res) => {
+router.post("/register", async (req, res) => {
   try {
     const hashPass = await bcrypt.hash(req.body.password, saltRounds);
     const newUser = new User({
@@ -50,6 +21,7 @@ router.post("/registerv2", async (req, res) => {
   }
 });
 
+// Update profile picture
 router.put("/profilePicture/:id", async (req, res) => {
   try {
   } catch (error) {}
@@ -57,25 +29,6 @@ router.put("/profilePicture/:id", async (req, res) => {
     $set: { profilePicture: req.body.profilePicture },
   });
 });
-
-// router.post("/register", upload.single("profileImg"), async (req, res) => {
-//   try {
-//     const url = req.protocol + "://" + req.get("host"); // url for the website
-//     const hashPass = await bcrypt.hash(req.body.password, saltRounds);
-//     const profilePictureUrl = req.file ? req.file.filename : "noAvatar.png";
-//     const newUser = new User({
-//       fullname: req.body.fullname,
-//       email: req.body.email,
-//       password: hashPass,
-//       profilePicture: profilePictureUrl,
-//     });
-//     console.log(newUser);
-//     const user = await newUser.save();
-//     res.status(200).json(user);
-//   } catch (err) {
-//     res.status(500).json(err);
-//   }
-// });
 
 // Login
 

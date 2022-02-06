@@ -1,9 +1,6 @@
-import { useState } from "react";
 import "./user.css";
 
 export default function User({ user }) {
-  const PF = process.env.REACT_APP_PUBLIC_FOLDER;
-
   if (user) {
     return (
       <>

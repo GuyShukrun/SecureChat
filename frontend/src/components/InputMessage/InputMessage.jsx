@@ -2,7 +2,6 @@ import React, { useRef } from "react";
 import "./inputMessage.css";
 import SendIcon from "@mui/icons-material/Send";
 import axios from "axios";
-import CryptoJS from "crypto-js";
 
 function InputMessage({
   messages,
@@ -59,7 +58,7 @@ function InputMessage({
         );
 
         //Update current conversation last message for displaying!
-        const res2 = await axios.put(
+        await axios.put(
           "http://localhost:8800/api/conversations/" + newConversation._id,
           { lastMessage: newMessage.text }
         );

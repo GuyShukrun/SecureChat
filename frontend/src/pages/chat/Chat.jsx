@@ -1,14 +1,10 @@
 import React from "react";
 import "./chat.css";
 import { useRef, useEffect, useState } from "react";
-import axios from "axios";
-import { io, Socket } from "socket.io-client";
-import Conversation from "../../components/Conversation/Conversation";
-import User from "../../components/User/User";
+import { io } from "socket.io-client";
 import ContactsScreen from "../../components/ContactsScreen/ContactsScreen";
 import ChatScreen from "../../components/ChatScreen/ChatScreen";
 export default function Chat({ user, setUser }) {
-  const PF = process.env.REACT_APP_PUBLIC_FOLDER;
   const [currentConversation, setCurrentConversation] = useState(null);
   const [arrivalMessage, setArrivalMessage] = useState(null);
 
