@@ -15,7 +15,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
       min: 6,
-      max: 12,
+      max: 30,
     },
     profilePicture: {
       type: String,

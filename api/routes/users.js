@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const storageRef = require("../index");
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
 const User = require("../models/User");
@@ -7,50 +8,75 @@ const multer = require("multer");
 const { v4: uuidv4 } = require("uuid");
 //CRUD
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "../frontend/public/uploads");
-  },
-  filename: (req, file, cb) => {
-    const fileName = file.originalname.toLowerCase().split(" ").join("-");
-    cb(null, uuidv4() + "-" + fileName);
-  },
-});
+// const storage = multer.diskStorage({
+//   destination: (req, file, cb) => {
+//     cb(null, "../frontend/public/uploads");
+//   },
+//   filename: (req, file, cb) => {
+//     const fileName = file.originalname.toLowerCase().split(" ").join("-");
+//     cb(null, uuidv4() + "-" + fileName);
+//   },
+// });
 
-const upload = multer({
-  storage: storage,
-  fileFilter: (req, file, cb) => {
-    if (
-      file.mimetype == "image/png" ||
-      file.mimetype == "image/jpg" ||
-      file.mimetype == "image/jpeg"
-    ) {
-      cb(null, true);
-    } else {
-      cb(null, false);
-      return cb(new Error("Only .png, .jpg and .jpeg format allowed!"));
-    }
-  },
-});
+// const upload = multer({
+//   storage: storage,
+//   fileFilter: (req, file, cb) => {
+//     if (
+//       file.mimetype == "image/png" ||
+//       file.mimetype == "image/jpg" ||
+//       file.mimetype == "image/jpeg"
+//     ) {
+//       cb(null, true);
+//     } else {
+//       cb(null, false);
+//       return cb(new Error("Only .png, .jpg and .jpeg format allowed!"));
+//     }
+//   },
+// });
 
-router.post("/register", upload.single("profileImg"), async (req, res) => {
+router.post("/registerv2", async (req, res) => {
   try {
-    const url = req.protocol + "://" + req.get("host"); // url for the website
     const hashPass = await bcrypt.hash(req.body.password, saltRounds);
-    const profilePictureUrl = req.file ? req.file.filename : "noAvatar.png";
     const newUser = new User({
       fullname: req.body.fullname,
       email: req.body.email,
       password: hashPass,
-      profilePicture: profilePictureUrl,
+      profilePicture: req.body.profilePicture,
     });
-    console.log(newUser);
     const user = await newUser.save();
     res.status(200).json(user);
-  } catch (err) {
-    res.status(500).json(err);
+  } catch (error) {
+    res.status(500).json(error);
   }
 });
+
+router.put("/profilePicture/:id", async (req, res) => {
+  try {
+  } catch (error) {}
+  const user = await User.findByIdAndUpdate(req.body.userId, {
+    $set: { profilePicture: req.body.profilePicture },
+  });
+});
+
+// router.post("/register", upload.single("profileImg"), async (req, res) => {
+//   try {
+//     const url = req.protocol + "://" + req.get("host"); // url for the website
+//     const hashPass = await bcrypt.hash(req.body.password, saltRounds);
+//     const profilePictureUrl = req.file ? req.file.filename : "noAvatar.png";
+//     const newUser = new User({
+//       fullname: req.body.fullname,
+//       email: req.body.email,
+//       password: hashPass,
+//       profilePicture: profilePictureUrl,
+//     });
+//     console.log(newUser);
+//     const user = await newUser.save();
+//     res.status(200).json(user);
+//   } catch (err) {
+//     res.status(500).json(err);
+//   }
+// });
+
 // Login
 
 router.post("/login", async (req, res) => {
@@ -62,7 +88,18 @@ router.post("/login", async (req, res) => {
     if (!validPass) return res.status(400).json("Password don't match");
 
     // Valid email and password
-    res.status(200).json(user);
+    const {
+      password,
+      updatedAt,
+      createdAt,
+      email,
+      friends,
+      isAdmin,
+      isOnline,
+      ...other
+    } = user._doc;
+
+    res.status(200).json(other);
   } catch (err) {
     res.status(500).json(err);
   }
@@ -76,7 +113,16 @@ router.get("/", async (req, res) => {
     const user = userId
       ? await User.findById(userId)
       : await User.findOne({ fullname: username });
-    const { password, updatedAt, ...other } = user._doc;
+    const {
+      password,
+      updatedAt,
+      createdAt,
+      email,
+      friends,
+      isAdmin,
+      isOnline,
+      ...other
+    } = user._doc;
     res.status(200).json(other);
   } catch (err) {
     return res.status(500).json(err);
@@ -119,47 +165,6 @@ router.delete("/:id", async (req, res) => {
     }
   } else {
     return res.status(403).json("You can delete only your account!");
-  }
-});
-// friend a user
-router.put("/:id/friend", async (req, res) => {
-  if (req.body.userId !== req.params.id) {
-    try {
-      const userToFriend = await User.findById(req.params.id);
-      const currentUser = await User.findById(req.body.userId);
-      if (!userToFriend.friends.includes(req.body.userId)) {
-        await userToFriend.updateOne({ $push: { friends: req.body.userId } });
-        await currentUser.updateOne({ $push: { friends: req.params.id } });
-        res.status(200).json("Now friends!");
-      } else {
-        res.status(403).json("You are already friends");
-      }
-    } catch (err) {
-      res.status(500).json(err);
-    }
-  } else {
-    res.status(403).json("You can't friend yourself!");
-  }
-});
-
-// Unfriend a user
-router.put("/:id/unfriend", async (req, res) => {
-  if (req.body.userId !== req.params.id) {
-    try {
-      const userToUnfriend = await User.findById(req.params.id);
-      const currentUser = await User.findById(req.body.userId);
-      if (!userToUnfriend.friends.includes(req.body.userId)) {
-        res.status(403).json("You are not friends");
-      } else {
-        await userToUnfriend.updateOne({ $pull: { friends: req.body.userId } });
-        await currentUser.updateOne({ $pull: { friends: req.params.id } });
-        res.status(200).json("Unfriend succefully");
-      }
-    } catch (err) {
-      res.status(500).json(err);
-    }
-  } else {
-    res.status(403).json("You can't unfriend yourself!");
   }
 });
 

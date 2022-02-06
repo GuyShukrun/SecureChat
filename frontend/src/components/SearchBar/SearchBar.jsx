@@ -8,6 +8,7 @@ function SearchBar({
   user,
   setSearchConversations,
   conversations,
+  setConversations,
   setUsersNoConversationsFound,
 }) {
   const search = useRef("");
@@ -22,17 +23,21 @@ function SearchBar({
         const res = await axios.get(
           "http://localhost:8800/api/users/search/" + search.current.value
         );
+        const conversations = await axios(
+          "http://localhost:8800/api/conversations/" + user._id
+        );
+        setConversations(conversations.data);
         const usersWithConversation = res.data.filter(
           (user2) =>
             user2._id !== user._id &&
-            conversations.some((c) => c.members.includes(user2._id))
+            conversations.data.some((c) => c.members.includes(user2._id))
         );
         const usersWithoutConversations = res.data.filter(
           (user2) =>
             user._id != user2._id && !usersWithConversation.includes(user2)
         );
 
-        const conversationsSearch = conversations.filter((c) =>
+        const conversationsSearch = conversations.data.filter((c) =>
           usersWithConversation.some((user2) => c.members.includes(user2._id))
         );
         setSearchConversations(conversationsSearch);
@@ -47,10 +52,6 @@ function SearchBar({
     }
   };
 
-  // useEffect(()=>{
-  //   if (newChat)
-  //   setSearchConversations([res.data,...searchConversations]);
-  // },[newChat])
   return (
     <div className="search-box">
       <div className="input-group rounded">

@@ -68,7 +68,7 @@ function ChatScreen({
         <div className="upper-chat ">
           <img
             className="profile-img rounded-circle  "
-            src={PF + "/" + friend?.profilePicture}
+            src={friend?.profilePicture}
             alt=""
           />
           <h6 className="user-fullname-upper-chat">{friend?.fullname}</h6>

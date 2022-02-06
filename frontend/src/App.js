@@ -19,7 +19,6 @@ function App() {
       setUser(foundUser);
     }
   }, []);
-  console.log(user);
   return (
     <Router>
       <Routes>

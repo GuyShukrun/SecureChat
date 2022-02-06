@@ -10,7 +10,7 @@ export default function User({ user }) {
         <div className="conversation bg-white">
           <img
             className="profile-img rounded-circle"
-            src={PF + "/" + user?.profilePicture}
+            src={user?.profilePicture}
             alt=""
           />
           <div className="conversation-user-text bg-white ">

@@ -23,12 +23,7 @@ function ContactsScreen({
 }) {
   const PF = process.env.REACT_APP_PUBLIC_FOLDER;
   const [isSearching, setIsSearching] = useState(false);
-  // const [usersNoConversationsFound, setUsersNoConversationsFound] = useState(
-  //   []
-  // );
-  // const [searchConversations, setSearchConversations] = useState([]);
 
-  // Get conversations useEffect on first render
   useEffect(() => {
     const getConversations = async () => {
       try {
@@ -54,7 +49,7 @@ function ContactsScreen({
       <div className="settings-tray">
         <img
           className="rounded-circle profile-img"
-          src={PF + "/" + user.profilePicture}
+          src={user.profilePicture}
           alt="User's profile"
         />
         <LogoutIcon className="settingsIcon" onClick={handleLogout} />
@@ -62,6 +57,7 @@ function ContactsScreen({
       <SearchBar
         setIsSearching={setIsSearching}
         user={user}
+        setConversations={setConversations}
         setUsersNoConversationsFound={setUsersNoConversationsFound}
         setSearchConversations={setSearchConversations}
         conversations={conversations}

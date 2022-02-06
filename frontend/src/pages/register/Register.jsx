@@ -3,6 +3,8 @@ import { useRef, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "./register.css";
+import { getDownloadURL, ref, uploadBytesResumable } from "@firebase/storage";
+import { storage } from "../../firebase/firebase.js";
 export default function Register() {
   const email = useRef("");
   const password = useRef("");
@@ -11,49 +13,77 @@ export default function Register() {
 
   const [profileImg, setProfileImg] = useState(null);
 
+  const noAvatarUrl =
+    "https://firebasestorage.googleapis.com/v0/b/chat-fe2b0.appspot.com/o/images%2FnoAvatar.png?alt=media&token=ea7cc780-ee0b-4377-9d1d-97ba3d128662";
   const handleFileInput = (e) => {
     setProfileImg(e.target.files[0]); //Take the first pic
   };
   const handleRegister = (e) => {
     e.preventDefault();
-    console.log(profileImg);
-    console.log(fullname.current.value);
-    console.log(email.current.value);
-    console.log(password.current.value);
+    // console.log(profileImg);
 
-    const formData = new FormData();
-    // Appending all the key-value pairs for registration test
-    formData.append("profileImg", profileImg);
-    formData.append("email", email.current.value);
-    formData.append("fullname", fullname.current.value);
-    formData.append("password", password.current.value);
+    // const formData = new FormData();
+    // // Appending all the key-value pairs for registration test
+    // formData.append("profileImg", profileImg);
+    // formData.append("email", email.current.value);
+    // formData.append("fullname", fullname.current.value);
+    // formData.append("password", password.current.value);
 
-    axios
-      .post("http://localhost:8800/api/users/register", formData, {})
-      .then((res) => {
-        navigate("/login");
-        // console.log(res);
-      });
+    // axios
+    //   .post("http://localhost:8800/api/users/register", formData, {})
+    //   .then((res) => {
+    //     navigate("/login");
+    //     // console.log(res);
+    //   });
 
-    // e.target.classList.add("disabled");
-    // // loginCall(
-    // //   { email: email.current.value, password: password.current.value },
-    // //   dispatch
-    // // );
-    // let userCredentials = {
-    //   email: email.current.value,
-    //   password: password.current.value,
-    // };
-    // try {
-    //   axios
-    //     .post("http://localhost:8800/api/users/login", userCredentials)
-    //     .then((res) => {
-    //       localStorage.setItem("user", JSON.stringify(res.data));
-    //       setUser(res.data);
-    //     });
-    // } catch (err) {
-    //   console.log(err);
-    // }
+    // profile image is chosen!
+
+    if (profileImg) {
+      const storageRef = ref(storage, `/images/${profileImg.name}`);
+      const uploadTask = uploadBytesResumable(storageRef, profileImg);
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {},
+        (error) => {
+          console.log(error);
+        },
+        () => {
+          getDownloadURL(uploadTask.snapshot.ref)
+            .then((url) => {
+              let userCredentials = {
+                email: email.current.value,
+                password: password.current.value,
+                fullname: fullname.current.value,
+                profilePicture: url,
+              };
+              return axios.post(
+                "http://localhost:8800/api/users/registerv2",
+                userCredentials
+              );
+            })
+            .then((res) => {
+              navigate("/login");
+            })
+            .catch((err) => alert(err));
+        }
+      );
+    }
+
+    // No profile image selected
+    else {
+      let userCredentials = {
+        email: email.current.value,
+        password: password.current.value,
+        fullname: fullname.current.value,
+        profileImg: noAvatarUrl,
+      };
+      axios
+        .post("http://localhost:8800/api/users/register", userCredentials)
+        .then((res) => {
+          navigate("/login");
+        })
+        .catch((err) => alert(err));
+    }
   };
   return (
     <div className="vh-100">

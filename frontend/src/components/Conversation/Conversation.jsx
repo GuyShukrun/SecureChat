@@ -15,6 +15,7 @@ export default function Conversation({
   const [messageCounter, setMessageCounter] = useState(0);
   const [user, setUser] = useState(null); // Friend user
   const ownIndex = conversation.members.indexOf(currentUser._id);
+  const didMountRef = useRef(false);
 
   // Function to update message counter in the DB
   const updateMessageCounter = async (count) => {
@@ -89,29 +90,17 @@ export default function Conversation({
     }
   }, [currentConversation]);
 
-  // if messageCounter changes, change the value in the DB aswell
   useEffect(() => {
-    if (ownIndex === 0) {
-      axios
-        .put("http://localhost:8800/api/conversations/" + conversation._id, {
-          messageCounterMember1: `${messageCounter}`,
-        })
-        .then((res) => console.log(res))
-        .catch((err) => console.log(err));
-    } else {
-      axios
-        .put("http://localhost:8800/api/conversations/" + conversation._id, {
-          messageCounterMember2: `${messageCounter}`,
-        })
-        .then((res) => console.log(res))
-        .catch((err) => console.log(err));
+    if (!didMountRef.current) {
+      didMountRef.current = true;
+      return;
     }
-  }, [messageCounter]);
-  // Change own state of last message if I got message through the socket
-
-  useEffect(() => {
-    if (arrivalMessage && arrivalMessage.conversation._id === conversation._id)
+    if (
+      arrivalMessage &&
+      arrivalMessage.conversation._id === conversation._id
+    ) {
       setOwnLastMessage(arrivalMessage);
+    }
 
     if (
       (arrivalMessage &&
@@ -119,8 +108,8 @@ export default function Conversation({
         currentConversation &&
         currentConversation._id !== conversation._id) ||
       (arrivalMessage &&
-        arrivalMessage.conversation._id === conversation._id &&
-        !currentConversation)
+        !currentConversation &&
+        arrivalMessage.conversation._id === conversation._id)
     ) {
       updateMessageCounter(messageCounter + 1);
       setMessageCounter(messageCounter + 1);
@@ -142,7 +131,7 @@ export default function Conversation({
         <div className="conversation bg-white">
           <img
             className="profile-img rounded-circle"
-            src={PF + "/" + user?.profilePicture}
+            src={user?.profilePicture}
             alt=""
           />
           <div className="conversation-user-text bg-white ">
