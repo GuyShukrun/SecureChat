@@ -1,6 +1,7 @@
 import React from "react";
 import { useRef, useState } from "react";
 import axios from "axios";
+import { registerCall } from "../../apiCalls";
 import { useNavigate } from "react-router-dom";
 import "./register.css";
 import { getDownloadURL, ref, uploadBytesResumable } from "@firebase/storage";
@@ -20,6 +21,17 @@ export default function Register() {
   };
   const handleRegister = (e) => {
     e.preventDefault();
+
+    // Guard protectors
+    if (password.current.value.length < 6) {
+      alert("Password length must be at least 6 characters");
+      return;
+    }
+    if (fullname.current.value.length < 1) {
+      alert("Full name length must be at least 1 character");
+      return;
+    }
+
     if (profileImg) {
       const storageRef = ref(storage, `/images/${profileImg.name}`);
       const uploadTask = uploadBytesResumable(storageRef, profileImg);
@@ -30,50 +42,38 @@ export default function Register() {
           console.log(error);
         },
         () => {
-          getDownloadURL(uploadTask.snapshot.ref)
-            .then((url) => {
-              let userCredentials = {
-                email: email.current.value,
-                password: password.current.value,
-                fullname: fullname.current.value,
-                profilePicture: url,
-              };
-              return axios.post(
-                "http://localhost:8800/api/users/register",
-                userCredentials
+          getDownloadURL(uploadTask.snapshot.ref).then((url) => {
+            let userCredentials = {
+              email: email.current.value,
+              password: password.current.value,
+              fullname: fullname.current.value,
+              profilePicture: url,
+            };
+            registerCall(userCredentials)
+              .then((res) => {
+                navigate("/login");
+              })
+              .catch((error) =>
+                alert("Something went wrong, please try again")
               );
-            })
-            .then((res) => {
-              navigate("/login");
-            })
-            .catch((err) => alert("Something went wrong, please try again"));
+          });
         }
       );
     }
 
     // No profile image selected
     else {
-      if (password.current.value.length < 6) {
-        alert("Password length must be at least 6 characters");
-        return;
-      }
-      if (fullname.current.value.length < 1) {
-        alert("Full name length must be at least 1 character");
-        return;
-      }
-
       let userCredentials = {
         email: email.current.value,
         password: password.current.value,
         fullname: fullname.current.value,
         profilePicture: noAvatarUrl,
       };
-      axios
-        .post("http://localhost:8800/api/users/register", userCredentials)
+      registerCall(userCredentials)
         .then((res) => {
           navigate("/login");
         })
-        .catch((err) => alert("Something went wrong, please try again"));
+        .catch((error) => alert("Something went wrong, please try again"));
     }
   };
   return (
@@ -81,7 +81,7 @@ export default function Register() {
       <div className="container h-100 w-100 d-flex justify-content-center align-items-center">
         <div className="row ">
           <div className="col ">
-            <h1 class="logo text-center mb-5 mt-5">SecureChat</h1>
+            <h1 className="logo text-center mb-5 mt-5">SecureChat</h1>
             <img
               src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/draw2.svg"
               className="img-fluid"
@@ -127,7 +127,7 @@ export default function Register() {
                   Password length must be at least 6 characters.
                 </small>
               </div>
-              <div class="form-group mt-2">
+              <div className="form-group mt-2">
                 <label className="mb-2">Choose Profile Picture</label>
                 <input
                   type="file"

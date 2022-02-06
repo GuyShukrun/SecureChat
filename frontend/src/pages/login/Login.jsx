@@ -1,4 +1,5 @@
 import React, { useRef } from "react";
+import { loginCall } from "../../apiCalls";
 import "./login.css";
 import axios from "axios";
 export default function Login({ user, setUser }) {
@@ -9,16 +10,11 @@ export default function Login({ user, setUser }) {
   const handleLogin = (e) => {
     e.preventDefault();
     e.target.classList.add("disabled");
-    // loginCall(
-    //   { email: email.current.value, password: password.current.value },
-    //   dispatch
-    // );
     let userCredentials = {
       email: email.current.value,
       password: password.current.value,
     };
-    axios
-      .post("http://localhost:8800/api/users/login", userCredentials)
+    loginCall(userCredentials)
       .then((res) => {
         localStorage.setItem("user", JSON.stringify(res.data));
         setUser(res.data);
