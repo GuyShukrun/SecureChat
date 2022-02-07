@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Conversation = require("../models/Conversation");
-
+const CryptoJS = require("crypto-js");
 // Create new conversation
 router.post("/", async (req, res) => {
   const newConversation = new Conversation({
@@ -35,10 +35,14 @@ router.get("/:userId", async (req, res) => {
 router.put("/:conversationId", async (req, res) => {
   if (req.body.lastMessage) {
     try {
+      const textEncrypted = CryptoJS.AES.encrypt(
+        req.body.lastMessage,
+        process.env.SECRET_KEY
+      ).toString();
       const conversation = await Conversation.findByIdAndUpdate(
         req.params.conversationId,
         {
-          $set: { updatedAt: new Date(), lastMessage: req.body.lastMessage },
+          $set: { updatedAt: new Date(), lastMessage: textEncrypted },
         }
       );
       res.status(200).json(`conversation last message updated`);
