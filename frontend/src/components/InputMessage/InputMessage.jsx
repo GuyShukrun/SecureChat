@@ -1,7 +1,11 @@
 import React, { useRef } from "react";
 import "./inputMessage.css";
 import SendIcon from "@mui/icons-material/Send";
-import axios from "axios";
+import {
+  postNewConversation,
+  postNewMessage,
+  updateConversation,
+} from "../../apiCalls";
 
 function InputMessage({
   messages,
@@ -30,15 +34,12 @@ function InputMessage({
       let newConversation = currentConversation;
       try {
         if (!newMessage.conversationId) {
-          const res = await axios.post(
-            "http://localhost:8800/api/conversations",
-            {
-              senderId: user._id,
-              receiverId: friend._id,
-              messageCounterMember1: 0,
-              messageCounterMember2: 1,
-            }
-          );
+          const res = await postNewConversation({
+            senderId: user._id,
+            receiverId: friend._id,
+            messageCounterMember1: 0,
+            messageCounterMember2: 1,
+          });
           setConversations([res.data, ...conversations]);
           let copy = searchConversations;
           // setSearchConversations([]);
@@ -52,22 +53,16 @@ function InputMessage({
           // newConversation = res.data;
         }
         // post new message
-        const res = await axios.post(
-          "http://localhost:8800/api/messages/",
-          newMessage
-        );
+        const res = await postNewMessage(newMessage);
 
         //Update current conversation last message for displaying!
-        await axios.put(
-          "http://localhost:8800/api/conversations/" + newConversation._id,
-          { lastMessage: newMessage.text }
-        );
-        // setGotMessage(!gotMessage);
+        await updateConversation(newConversation._id, {
+          lastMessage: newMessage.text,
+        });
+
         setMessages([...messages, res.data]);
         setLastMessage(res.data);
         setCurrentConversation(newConversation);
-
-        // if (newConversation) setCurrentConversation(newConversation);
 
         socket.current.emit("sendMessage", {
           conversation: newConversation,

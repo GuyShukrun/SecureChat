@@ -1,7 +1,11 @@
 import React, { useRef } from "react";
 import { useEffect, useState } from "react";
-import axios from "axios";
 import "./conversation.css";
+import {
+  getLastMessageFromConversation,
+  getUser,
+  updateConversation,
+} from "../../apiCalls";
 export default function Conversation({
   conversation,
   currentUser,
@@ -20,19 +24,13 @@ export default function Conversation({
   const updateMessageCounter = async (count) => {
     try {
       if (ownIndex === 0) {
-        await axios.put(
-          "http://localhost:8800/api/conversations/" + conversation._id,
-          {
-            messageCounterMember1: `${count}`,
-          }
-        );
+        await updateConversation(conversation._id, {
+          messageCounterMember1: `${count}`,
+        });
       } else {
-        await axios.put(
-          "http://localhost:8800/api/conversations/" + conversation._id,
-          {
-            messageCounterMember2: `${count}`,
-          }
-        );
+        await updateConversation(conversation._id, {
+          messageCounterMember2: `${count}`,
+        });
       }
     } catch (error) {
       console.log(error);
@@ -45,27 +43,23 @@ export default function Conversation({
     ownIndex === 0
       ? setMessageCounter(conversation.messageCounterMember1)
       : setMessageCounter(conversation.messageCounterMember2);
-    const getUser = async () => {
+
+    const getFriend = async () => {
       try {
-        const res = await axios(
-          "http://localhost:8800/api/users?userId=" + friendId
-        );
-        setUser(res.data);
+        const friend = await getUser(friendId);
+        setUser(friend.data);
       } catch (error) {
         console.log(error);
       }
     };
-    getUser();
+    getFriend();
   }, []);
 
   //Get last message when first render
   useEffect(() => {
     const getLastMessage = async () => {
       try {
-        const res = await axios(
-          "http://localhost:8800/api/messages/lastMessage/" + conversation._id
-        );
-        // setLastMessage(res.data);
+        const res = await getLastMessageFromConversation(conversation._id);
         setOwnLastMessage(res.data);
       } catch (error) {
         console.log(error);

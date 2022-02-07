@@ -1,6 +1,5 @@
 import React, { useRef } from "react";
 import SearchIcon from "@mui/icons-material/Search";
-import axios from "axios";
 import "./searchBar.css";
 import { searchUserCall, getUserConversations } from "../../apiCalls";
 

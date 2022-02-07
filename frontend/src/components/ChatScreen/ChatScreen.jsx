@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import InputMessage from "../InputMessage/InputMessage";
 import MessagesScreen from "../MessagesScreen/MessagesScreen";
-import axios from "axios";
 import "./chatScreen.css";
+import { getMessagesInConversation, getUser } from "../../apiCalls";
 function ChatScreen({
   currentConversation,
   user,
@@ -27,10 +27,8 @@ function ChatScreen({
         (member) => member !== user._id
       );
       try {
-        const res = await axios.get(
-          "http://localhost:8800/api/users?userId=" + friendId
-        );
-        setFriend(res.data);
+        const friend = await getUser(friendId);
+        setFriend(friend.data);
       } catch (error) {
         console.log(error);
       }
@@ -38,10 +36,10 @@ function ChatScreen({
 
     const getMessages = async () => {
       try {
-        const res = await axios.get(
-          "http://localhost:8800/api/messages/" + currentConversation._id
+        const messages = await getMessagesInConversation(
+          currentConversation._id
         );
-        setMessages(res.data);
+        setMessages(messages.data);
       } catch (error) {
         console.log(error);
       }

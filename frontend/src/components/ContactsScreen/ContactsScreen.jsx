@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import SearchBar from "../SearchBar/SearchBar";
 import UsersList from "../UsersList/UsersList";
 import LogoutIcon from "@mui/icons-material/Logout";
-import axios from "axios";
 import "./contactsScreen.css";
+import { getUserConversations } from "../../apiCalls";
 
 function ContactsScreen({
   currentConversation,
@@ -26,10 +26,8 @@ function ContactsScreen({
   useEffect(() => {
     const getConversations = async () => {
       try {
-        const res = await axios.get(
-          "http://localhost:8800/api/conversations/" + user._id
-        );
-        setConversations(res.data);
+        const conversations = await getUserConversations(user._id);
+        setConversations(conversations.data);
       } catch (error) {
         console.log(error);
       }

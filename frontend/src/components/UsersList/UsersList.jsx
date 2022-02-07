@@ -3,6 +3,7 @@ import Conversation from "../Conversation/Conversation";
 import User from "../User/User";
 import axios from "axios";
 import "./userslist.css";
+import { getUserConversations } from "../../apiCalls";
 
 function UsersList({
   setCurrentConversation,
@@ -24,10 +25,8 @@ function UsersList({
         arrivalMessage &&
         !conversations.some((c) => c._id === arrivalMessage.conversation._id)
       ) {
-        const res = await axios(
-          "http://localhost:8800/api/conversations/" + user._id
-        );
-        // setConversations([]);
+        const res = await getUserConversations(user._id);
+
         setConversations(res.data);
       } else if (arrivalMessage) {
         let conv = conversations.find(

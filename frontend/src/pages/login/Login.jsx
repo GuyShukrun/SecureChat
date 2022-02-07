@@ -1,7 +1,6 @@
 import React, { useRef } from "react";
 import { loginCall } from "../../apiCalls";
 import "./login.css";
-import axios from "axios";
 export default function Login({ user, setUser }) {
   // Using useRef will not cause rerender our all page when user submit a letter
   // const { user, isFetching, error, dispatch } = useContext(AuthContext);

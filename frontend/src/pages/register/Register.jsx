@@ -1,6 +1,5 @@
 import React from "react";
 import { useRef, useState } from "react";
-import axios from "axios";
 import { registerCall } from "../../apiCalls";
 import { useNavigate } from "react-router-dom";
 import "./register.css";
