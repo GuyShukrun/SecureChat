@@ -12,7 +12,7 @@ function MessagesScreen({ user, messages, socket, setMessages }) {
 
   return (
     <div className="chat-panel  ">
-      {messages.map((m, key) => (
+      {messages.map((m) => (
         <div key={m._id} ref={scrollRef}>
           <Message key={m._id} message={m} own={m.sender === user._id} />
         </div>
