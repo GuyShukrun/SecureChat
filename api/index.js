@@ -9,8 +9,16 @@ const helmet = require("helmet");
 const userRoute = require("./routes/users");
 const conversationRoute = require("./routes/conversations");
 const messageRoute = require("./routes/messages");
-// const { v4: uuidv4 } = require("uuid");
 const port = 8800;
+
+// Setting up server with socket.io
+const http = require("http").Server(app);
+const io = require("socket.io")(http, {
+  cors: {
+    origin: "http://localhost:3000",
+  },
+});
+
 app.use("/uploads", express.static("public")); // uploads image as public folder
 app.use(cors());
 
@@ -23,30 +31,70 @@ app.use(express.json());
 app.use(helmet());
 app.use(morgan("combined"));
 
-// FireBase
-const firebaseAdmin = require("firebase-admin");
-const firebaseConfig = {
-  apiKey: "AIzaSyBGKwVo_uj7NJnsOillpO819qIrwPH-LOE",
-  authDomain: "chat-fe2b0.firebaseapp.com",
-  projectId: "chat-fe2b0",
-  storageBucket: "chat-fe2b0.appspot.com",
-  messagingSenderId: "229088629336",
-  appId: "1:229088629336:web:54d50e12ead1c601e1b02d",
-  measurementId: "G-T8RJ2BC2JR",
-};
-
-const admin = firebaseAdmin.initializeApp(firebaseConfig);
-const storageRef = admin.storage().bucket(`gs://chat-fe2b0.appspot.com/`);
 // routes for api calls
 app.use("/api/users", userRoute);
 app.use("/api/conversations", conversationRoute);
 app.use("/api/messages", messageRoute);
-app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`);
+
+// app.listen(port, () => {
+//   console.log(`Example app listening at http://localhost:${port}`);
+// });
+
+const server = http.listen(port, () => {
+  const { port } = server.address();
+  console.log(`Listening on port ${port}`);
 });
 
 app.get("/", (req, res) => {
   res.send("Hello world");
 });
 
-module.export = storageRef;
+// socket io functions
+
+let users = [];
+
+const addUser = (userId, socketId) => {
+  !users.some((user) => user.userId === userId) &&
+    users.push({ userId, socketId });
+};
+
+const removeUser = (socketId) => {
+  users = users.filter((user) => user.socketId !== socketId);
+};
+
+const getUser = (userId) => {
+  return users.find((user) => userId === user.userId);
+};
+
+// connection
+io.on("connection", (socket) => {
+  console.log(" a user connected.");
+  // take userId and socketId from user, client-side.
+  socket.on("addUser", (userId) => {
+    addUser(userId, socket.id);
+    io.emit("getUsers", users);
+  });
+  //disconnection
+  socket.on("disconnect", () => {
+    console.log("a user disconnected");
+    removeUser(socket.id);
+    io.emit("getUsers", users);
+  });
+
+  // send and get messages
+  socket.on("sendMessage", ({ conversation, senderId, receiverId, text }) => {
+    const user = getUser(receiverId);
+    io.to(user?.socketId).emit("getMessage", {
+      conversation,
+      senderId,
+      text,
+    });
+  });
+
+  socket.on("resetCounter", ({ conversation, receiverId }) => {
+    const user = getUser(receiverId);
+    io.to(user?.socketId).emit("getReset", {
+      conversation,
+    });
+  });
+});

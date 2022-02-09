@@ -20,7 +20,7 @@ export default function Chat({ user, setUser }) {
   // Set socket on first render
   // Set behavior on getting message
   useEffect(() => {
-    socket.current = io("ws://localhost:8900");
+    socket.current = io("ws://localhost:8800");
     socket.current.on("getMessage", (data) => {
       setArrivalMessage({
         conversation: data.conversation,

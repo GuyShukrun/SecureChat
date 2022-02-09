@@ -135,6 +135,18 @@ export default function Conversation({
     ) {
       // updateMessageCounter(messageCounter + 1);
       setMessageCounter(messageCounter + 1);
+    } else if (
+      arrivalMessage &&
+      arrivalMessage.conversation._id === conversation._id &&
+      currentConversation &&
+      currentConversation._id === conversation._id
+    ) {
+      updateMessageCounter("0");
+      setMessageCounter(0);
+      socket.current.emit("resetCounter", {
+        conversation: currentConversation,
+        receiverId: user._id,
+      });
     }
   }, [arrivalMessage]);
 
