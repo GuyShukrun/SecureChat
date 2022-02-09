@@ -15,8 +15,8 @@ export default function Login({ user, setUser }) {
     };
     loginCall(userCredentials)
       .then((res) => {
-        localStorage.setItem("user", JSON.stringify(res.data));
-        setUser(res.data);
+        localStorage.setItem("token", res.data.token);
+        setUser(res.data.other);
       })
       .catch((err) => alert("Email or password incorrect"));
   };

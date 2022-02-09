@@ -14,6 +14,7 @@ export default function Chat({ user, setUser }) {
   const [usersNoConversationsFound, setUsersNoConversationsFound] = useState(
     []
   );
+  const [conversationReset, setConversationReset] = useState(null);
   const socket = useRef();
 
   // Set socket on first render
@@ -28,6 +29,10 @@ export default function Chat({ user, setUser }) {
         createdAt: Date.now(),
       });
     });
+
+    socket.current.on("getReset", (conversation) => {
+      setConversationReset(conversation);
+    });
   }, []);
 
   useEffect(() => {
@@ -40,6 +45,7 @@ export default function Chat({ user, setUser }) {
       <div className="row no-gutters ">
         <div className="col-4 border-right">
           <ContactsScreen
+            conversationReset={conversationReset}
             socket={socket}
             user={user}
             setUser={setUser}

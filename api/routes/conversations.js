@@ -2,8 +2,9 @@ const express = require("express");
 const router = express.Router();
 const Conversation = require("../models/Conversation");
 const CryptoJS = require("crypto-js");
+const authToken = require("./verifyToken");
 // Create new conversation
-router.post("/", async (req, res) => {
+router.post("/", authToken, async (req, res) => {
   const newConversation = new Conversation({
     members: [req.body.senderId, req.body.receiverId],
     lastMessage: "",
@@ -20,7 +21,7 @@ router.post("/", async (req, res) => {
 });
 
 // Get all conversations related to user
-router.get("/:userId", async (req, res) => {
+router.get("/:userId", authToken, async (req, res) => {
   try {
     const conversation = await Conversation.find({
       members: { $in: [req.params.userId] },
@@ -31,8 +32,8 @@ router.get("/:userId", async (req, res) => {
   }
 });
 
-// Update last message
-router.put("/:conversationId", async (req, res) => {
+// Update converastion lastmessage or count
+router.put("/:conversationId", authToken, async (req, res) => {
   if (req.body.lastMessage) {
     try {
       const textEncrypted = CryptoJS.AES.encrypt(

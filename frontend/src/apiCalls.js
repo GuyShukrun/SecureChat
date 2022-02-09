@@ -24,10 +24,15 @@ export const registerCall = async (userCredentials) => {
   }
 };
 
-export const searchUserCall = async (userToSearch) => {
+export const searchUserCall = async (userToSearch, token) => {
   try {
     const res = await axios.get(
-      "http://localhost:8800/api/users/search/" + userToSearch
+      "http://localhost:8800/api/users/search/" + userToSearch,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
     );
     return res;
   } catch (error) {
@@ -35,10 +40,15 @@ export const searchUserCall = async (userToSearch) => {
   }
 };
 
-export const getUserConversations = async (userId) => {
+export const getUserConversations = async (userId, token) => {
   try {
     const res = await axios(
-      "http://localhost:8800/api/conversations/" + userId
+      "http://localhost:8800/api/conversations/" + userId,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
     );
     return res;
   } catch (error) {
@@ -46,10 +56,15 @@ export const getUserConversations = async (userId) => {
   }
 };
 
-export const getUser = async (userId) => {
+export const getUser = async (userId, token) => {
   try {
     const res = await axios.get(
-      "http://localhost:8800/api/users?userId=" + userId
+      "http://localhost:8800/api/users?userId=" + userId,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
     );
     return res;
   } catch (error) {
@@ -57,10 +72,15 @@ export const getUser = async (userId) => {
   }
 };
 
-export const getMessagesInConversation = async (conversationId) => {
+export const getMessagesInConversation = async (conversationId, token) => {
   try {
     const res = await axios.get(
-      "http://localhost:8800/api/messages/" + conversationId
+      "http://localhost:8800/api/messages/" + conversationId,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
     );
     return res;
   } catch (error) {
@@ -68,11 +88,16 @@ export const getMessagesInConversation = async (conversationId) => {
   }
 };
 
-export const updateConversation = async (conversationId, updates) => {
+export const updateConversation = async (conversationId, updates, token) => {
   try {
     const res = await axios.put(
       "http://localhost:8800/api/conversations/" + conversationId,
-      updates
+      updates,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
     );
     return res;
   } catch (error) {
@@ -80,10 +105,15 @@ export const updateConversation = async (conversationId, updates) => {
   }
 };
 
-export const getLastMessageFromConversation = async (conversationId) => {
+export const getLastMessageFromConversation = async (conversationId, token) => {
   try {
     const res = await axios(
-      "http://localhost:8800/api/messages/lastMessage/" + conversationId
+      "http://localhost:8800/api/messages/lastMessage/" + conversationId,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
     );
     return res;
   } catch (error) {
@@ -91,11 +121,16 @@ export const getLastMessageFromConversation = async (conversationId) => {
   }
 };
 
-export const postNewConversation = async (newConversation) => {
+export const postNewConversation = async (newConversation, token) => {
   try {
     const res = await axios.post(
       "http://localhost:8800/api/conversations",
-      newConversation
+      newConversation,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
     );
     return res;
   } catch (error) {
@@ -103,12 +138,30 @@ export const postNewConversation = async (newConversation) => {
   }
 };
 
-export const postNewMessage = async (newMessage) => {
+export const postNewMessage = async (newMessage, token) => {
   try {
     const res = await axios.post(
       "http://localhost:8800/api/messages/",
-      newMessage
+      newMessage,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
     );
+    return res;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const getUserByToken = async (token) => {
+  try {
+    const res = await axios.get("http://localhost:8800/api/users/token", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     return res;
   } catch (error) {
     console.log(error);

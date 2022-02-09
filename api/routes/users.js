@@ -3,6 +3,8 @@ const router = express.Router();
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
 const User = require("../models/User");
+const jwt = require("jsonwebtoken");
+const authToken = require("./verifyToken");
 //CRUD
 
 router.post("/register", async (req, res) => {
@@ -22,7 +24,7 @@ router.post("/register", async (req, res) => {
 });
 
 // Update profile picture
-router.put("/profilePicture/:id", async (req, res) => {
+router.put("/profilePicture/:id", authToken, async (req, res) => {
   try {
   } catch (error) {}
   const user = await User.findByIdAndUpdate(req.body.userId, {
@@ -39,8 +41,10 @@ router.post("/login", async (req, res) => {
 
     const validPass = await bcrypt.compare(req.body.password, user.password);
     if (!validPass) return res.status(400).json("Password don't match");
-
     // Valid email and password
+    // Assigning toekn for authentication
+    const token = jwt.sign({ _id: user._id }, process.env.SECRET_KEY);
+
     const {
       password,
       updatedAt,
@@ -52,14 +56,14 @@ router.post("/login", async (req, res) => {
       ...other
     } = user._doc;
 
-    res.status(200).json(other);
+    res.status(200).json({ other, token });
   } catch (err) {
     res.status(500).json(err);
   }
 });
 
 // Get a user
-router.get("/", async (req, res) => {
+router.get("/", authToken, async (req, res) => {
   const userId = req.query.userId;
   const username = req.query.username;
   try {
@@ -84,7 +88,7 @@ router.get("/", async (req, res) => {
 
 // Update user
 
-router.put("/:id", async (req, res) => {
+router.put("/:id", authToken, async (req, res) => {
   if (req.body.userId === req.params.id || req.body.isAdmin) {
     // update password
     if (req.body.password) {
@@ -108,7 +112,7 @@ router.put("/:id", async (req, res) => {
 });
 
 // Delete user
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", authToken, async (req, res) => {
   if (req.body.userId === req.params.id || req.body.isAdmin) {
     try {
       const user = await User.findByIdAndDelete(req.body.userId);
@@ -122,14 +126,40 @@ router.delete("/:id", async (req, res) => {
 });
 
 // Get all users that their full name start with..
-router.get("/search/:name", async (req, res) => {
+router.get("/search/:name", authToken, async (req, res) => {
   try {
     const users = await User.find({
       fullname: { $regex: `^${req.params.name}`, $options: "i" },
     });
-    res.status(200).json(users);
+    const usersWithoutInfo = users.map((user) => {
+      return {
+        _id: user._id,
+        fullname: user.fullname,
+        profilePicture: user.profilePicture,
+      };
+    });
+    res.status(200).json(usersWithoutInfo);
   } catch (error) {
     res.status(500).json(err);
+  }
+});
+
+router.get("/token", authToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    const {
+      password,
+      updatedAt,
+      createdAt,
+      email,
+      friends,
+      isAdmin,
+      isOnline,
+      ...other
+    } = user._doc;
+    res.status(200).json(other);
+  } catch (error) {
+    res.status(500).json(error);
   }
 });
 module.exports = router;

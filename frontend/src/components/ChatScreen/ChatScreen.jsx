@@ -27,7 +27,7 @@ function ChatScreen({
         (member) => member !== user._id
       );
       try {
-        const friend = await getUser(friendId);
+        const friend = await getUser(friendId, localStorage.getItem("token"));
         setFriend(friend.data);
       } catch (error) {
         console.log(error);
@@ -37,7 +37,8 @@ function ChatScreen({
     const getMessages = async () => {
       try {
         const messages = await getMessagesInConversation(
-          currentConversation._id
+          currentConversation._id,
+          localStorage.getItem("token")
         );
         setMessages(messages.data);
       } catch (error) {

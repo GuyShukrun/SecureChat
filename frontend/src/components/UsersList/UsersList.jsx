@@ -17,7 +17,10 @@ function UsersList({
   arrivalMessage,
   setConversations,
   currentConversation,
+  conversationReset,
+  socket,
 }) {
+  const token = localStorage.getItem("token");
   // If a user get message and he doesnt own the converstion, means it's new conversation, add the conversation to his converation list
   useEffect(() => {
     const getConvesationAccordingToMessage = async () => {
@@ -25,7 +28,7 @@ function UsersList({
         arrivalMessage &&
         !conversations.some((c) => c._id === arrivalMessage.conversation._id)
       ) {
-        const res = await getUserConversations(user._id);
+        const res = await getUserConversations(user._id, token);
 
         setConversations(res.data);
       } else if (arrivalMessage) {
@@ -77,6 +80,9 @@ function UsersList({
                 lastMessage={lastMessage}
                 arrivalMessage={arrivalMessage}
                 currentConversation={currentConversation}
+                conversationReset={conversationReset}
+                setCurrentConversation={setCurrentConversation}
+                socket={socket}
               />
             </div>
           ))}
@@ -113,6 +119,9 @@ function UsersList({
                 setLastMessage={setLastMessage}
                 arrivalMessage={arrivalMessage}
                 currentConversation={currentConversation}
+                conversationReset={conversationReset}
+                setCurrentConversation={setCurrentConversation}
+                socket={socket}
               />
             </div>
           ))}
@@ -159,6 +168,9 @@ function UsersList({
                 setLastMessage={setLastMessage}
                 arrivalMessage={arrivalMessage}
                 currentConversation={currentConversation}
+                conversationReset={conversationReset}
+                setCurrentConversation={setCurrentConversation}
+                socket={socket}
               />
             </div>
           ))}

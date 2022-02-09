@@ -1,6 +1,7 @@
 import React, { useRef } from "react";
 import "./inputMessage.css";
 import SendIcon from "@mui/icons-material/Send";
+
 import {
   postNewConversation,
   postNewMessage,
@@ -23,6 +24,8 @@ function InputMessage({
   usersNoConversationsFound,
   setUsersNoConversationsFound,
 }) {
+  const ownIndex = currentConversation.members.indexOf(user._id);
+  const token = localStorage.getItem("token");
   const handleSendMessage = async () => {
     if (message.current.value) {
       const newMessage = {
@@ -30,16 +33,22 @@ function InputMessage({
         sender: user._id,
         text: message.current.value,
       };
-      // TODO: merge the code together
+      let newMessageRes = null;
       let newConversation = currentConversation;
       try {
         if (!newMessage.conversationId) {
-          const res = await postNewConversation({
-            senderId: user._id,
-            receiverId: friend._id,
-            messageCounterMember1: 0,
-            messageCounterMember2: 1,
-          });
+          const res = await postNewConversation(
+            {
+              senderId: user._id,
+              receiverId: friend._id,
+              messageCounterMember1: 0,
+              messageCounterMember2: 1,
+            },
+            token
+          );
+          newMessage.conversationId = res.data._id;
+          newMessageRes = await postNewMessage(newMessage, token);
+
           setConversations([res.data, ...conversations]);
           let copy = searchConversations;
           // setSearchConversations([]);
@@ -49,19 +58,45 @@ function InputMessage({
           cloneUsers = cloneUsers.filter((user1) => user1._id !== friend._id);
           setUsersNoConversationsFound(cloneUsers);
           newConversation = res.data;
-          newMessage.conversationId = res.data._id;
+
           // newConversation = res.data;
+        } else {
+          newMessageRes = await postNewMessage(newMessage, token);
+          // update message counter on the local copy
+
+          if (ownIndex === 0) {
+            newConversation.messageCounterMember2++;
+          } else {
+            newConversation.messageCounterMember1++;
+          }
         }
         // post new message
-        const res = await postNewMessage(newMessage);
 
-        //Update current conversation last message for displaying!
-        await updateConversation(newConversation._id, {
-          lastMessage: newMessage.text,
-        });
+        //Update current conversation last message for displaying && message counter
+        await updateConversation(
+          newConversation._id,
+          { lastMessage: newMessage.text },
+          token
+        );
 
-        setMessages([...messages, res.data]);
-        setLastMessage(res.data);
+        ownIndex === 0
+          ? await updateConversation(
+              newConversation._id,
+              {
+                messageCounterMember2: newConversation.messageCounterMember2,
+              },
+              token
+            )
+          : await updateConversation(
+              newConversation._id,
+              {
+                messageCounterMember1: newConversation.messageCounterMember1,
+              },
+              token
+            );
+
+        setMessages([...messages, newMessageRes.data]);
+        setLastMessage(newMessageRes.data);
         setCurrentConversation(newConversation);
 
         socket.current.emit("sendMessage", {
@@ -77,6 +112,30 @@ function InputMessage({
       }
     }
   };
+  // const updateMessageCounter = async (count) => {
+  //   try {
+  //     if (ownIndex === 0) {
+  //       // update the user we sented him the message
+  //       await updateConversation(
+  //         newConversation._id,
+  //         {
+  //           messageCounterMember2: `${count}`,
+  //         },
+  //         token
+  //       );
+  //     } else {
+  //       await updateConversation(
+  //         newConversation._id,
+  //         {
+  //           messageCounterMember1: `${count}`,
+  //         },
+  //         token
+  //       );
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
 
   const message = useRef("");
   return (

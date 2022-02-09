@@ -20,20 +20,24 @@ function ContactsScreen({
   setSearchConversations,
   usersNoConversationsFound,
   setUsersNoConversationsFound,
+  conversationReset,
 }) {
   const [isSearching, setIsSearching] = useState(false);
 
   useEffect(() => {
     const getConversations = async () => {
       try {
-        const conversations = await getUserConversations(user._id);
+        const conversations = await getUserConversations(
+          user._id,
+          localStorage.getItem("token")
+        );
         setConversations(conversations.data);
       } catch (error) {
         console.log(error);
       }
     };
     getConversations();
-  }, []);
+  }, [conversationReset]);
   // Handle logout function
   const handleLogout = () => {
     socket.current.disconnect();
@@ -60,6 +64,7 @@ function ContactsScreen({
         conversations={conversations}
       />
       <UsersList
+        conversationReset={conversationReset}
         currentConversation={currentConversation}
         setCurrentConversation={setCurrentConversation}
         isSearching={isSearching}
@@ -71,6 +76,7 @@ function ContactsScreen({
         lastMessage={lastMessage}
         setLastMessage={setLastMessage}
         arrivalMessage={arrivalMessage}
+        socket={socket}
       />
     </>
   );

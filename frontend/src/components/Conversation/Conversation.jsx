@@ -12,8 +12,12 @@ export default function Conversation({
   lastMessage,
   setLastMessage,
   arrivalMessage,
+  conversationReset,
   currentConversation,
+  setCurrentConversation,
+  socket,
 }) {
+  const token = localStorage.getItem("token");
   const [ownLastMessage, setOwnLastMessage] = useState(null);
   const [messageCounter, setMessageCounter] = useState(0);
   const [user, setUser] = useState(null); // Friend user
@@ -24,18 +28,38 @@ export default function Conversation({
   const updateMessageCounter = async (count) => {
     try {
       if (ownIndex === 0) {
-        await updateConversation(conversation._id, {
-          messageCounterMember1: `${count}`,
-        });
+        await updateConversation(
+          conversation._id,
+          {
+            messageCounterMember1: `${count}`,
+          },
+          token
+        );
       } else {
-        await updateConversation(conversation._id, {
-          messageCounterMember2: `${count}`,
-        });
+        await updateConversation(
+          conversation._id,
+          {
+            messageCounterMember2: `${count}`,
+          },
+          token
+        );
       }
     } catch (error) {
       console.log(error);
     }
   };
+
+  useEffect(() => {
+    if (
+      conversationReset &&
+      conversationReset.conversation._id === conversation._id
+    ) {
+      if (ownIndex === 0) conversation.messageCounterMember2 = 0;
+      else conversation.messageCounterMember1 = 0;
+      if (currentConversation?._id === conversation._id)
+        setCurrentConversation(conversation);
+    }
+  }, [conversationReset]);
   // On first render - we get the user we talk to, last message and message counter
   useEffect(() => {
     const friendId = conversation.members.find((m) => m !== currentUser._id);
@@ -46,25 +70,26 @@ export default function Conversation({
 
     const getFriend = async () => {
       try {
-        const friend = await getUser(friendId);
+        const friend = await getUser(friendId, token);
         setUser(friend.data);
       } catch (error) {
         console.log(error);
       }
     };
-    getFriend();
-  }, []);
 
-  //Get last message when first render
-  useEffect(() => {
     const getLastMessage = async () => {
       try {
-        const res = await getLastMessageFromConversation(conversation._id);
+        const res = await getLastMessageFromConversation(
+          conversation._id,
+          token
+        );
         setOwnLastMessage(res.data);
       } catch (error) {
         console.log(error);
       }
     };
+
+    getFriend();
     getLastMessage();
   }, []);
 
@@ -80,6 +105,10 @@ export default function Conversation({
     if (currentConversation && currentConversation._id === conversation._id) {
       updateMessageCounter("0");
       setMessageCounter(0);
+      socket.current.emit("resetCounter", {
+        conversation: currentConversation,
+        receiverId: user._id,
+      });
     }
   }, [currentConversation]);
 
@@ -104,7 +133,7 @@ export default function Conversation({
         !currentConversation &&
         arrivalMessage.conversation._id === conversation._id)
     ) {
-      updateMessageCounter(messageCounter + 1);
+      // updateMessageCounter(messageCounter + 1);
       setMessageCounter(messageCounter + 1);
     }
   }, [arrivalMessage]);

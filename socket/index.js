@@ -43,4 +43,13 @@ io.on("connection", (socket) => {
       text,
     });
   });
+
+  socket.on("resetCounter", ({ conversation, receiverId }) => {
+    console.log("In reset in socket");
+    const user = getUser(receiverId);
+    console.log(user);
+    io.to(user?.socketId).emit("getReset", {
+      conversation,
+    });
+  });
 });

@@ -2,9 +2,10 @@ const express = require("express");
 const router = express.Router();
 const Message = require("../models/Message");
 const CryptoJS = require("crypto-js");
+const authToken = require("./verifyToken");
 
 // Create a new message, relating to existing conversation
-router.post("/", async (req, res) => {
+router.post("/", authToken, async (req, res) => {
   // First encrypt the message using AES encryption
   const textEncrypted = CryptoJS.AES.encrypt(
     req.body.text,
@@ -32,7 +33,7 @@ router.post("/", async (req, res) => {
 
 // Get all messages within a conversation
 
-router.get("/:conversationId", async (req, res) => {
+router.get("/:conversationId", authToken, async (req, res) => {
   try {
     let messages = await Message.find({
       conversationId: req.params.conversationId,
@@ -52,7 +53,7 @@ router.get("/:conversationId", async (req, res) => {
 });
 
 // Get last message within a conversation for displaying in chat converasations page
-router.get("/lastMessage/:conversationId", async (req, res) => {
+router.get("/lastMessage/:conversationId", authToken, async (req, res) => {
   try {
     const messages = await Message.find({
       conversationId: req.params.conversationId,

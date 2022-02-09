@@ -11,6 +11,7 @@ function SearchBar({
   setUsersNoConversationsFound,
 }) {
   const search = useRef("");
+  const token = localStorage.getItem("token");
 
   const handleSearch = async () => {
     if (search.current.value) {
@@ -19,8 +20,8 @@ function SearchBar({
       setUsersNoConversationsFound([]);
 
       try {
-        const users = await searchUserCall(search.current.value);
-        const conversations = await getUserConversations(user._id);
+        const users = await searchUserCall(search.current.value, token);
+        const conversations = await getUserConversations(user._id, token);
         setConversations(conversations.data);
         const usersWithConversation = users.data.filter(
           (user2) =>
