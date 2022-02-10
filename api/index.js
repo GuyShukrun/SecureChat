@@ -19,9 +19,6 @@ const io = require("socket.io")(http, {
   },
 });
 
-app.use("/uploads", express.static("public")); // uploads image as public folder
-app.use(cors());
-
 mongoose.connect(process.env.MONGO_URL, () => {
   console.log("Connected to Database");
 });
@@ -30,15 +27,12 @@ mongoose.connect(process.env.MONGO_URL, () => {
 app.use(express.json());
 app.use(helmet());
 app.use(morgan("combined"));
+app.use(cors());
 
 // routes for api calls
 app.use("/api/users", userRoute);
 app.use("/api/conversations", conversationRoute);
 app.use("/api/messages", messageRoute);
-
-// app.listen(port, () => {
-//   console.log(`Example app listening at http://localhost:${port}`);
-// });
 
 const server = http.listen(port, () => {
   const { port } = server.address();
