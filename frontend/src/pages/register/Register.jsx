@@ -10,7 +10,7 @@ export default function Register() {
   const password = useRef("");
   const fullname = useRef("");
   const navigate = useNavigate();
-
+  const [loading, setLoading] = useState(false);
   const [profileImg, setProfileImg] = useState(null);
 
   const noAvatarUrl =
@@ -20,14 +20,17 @@ export default function Register() {
   };
   const handleRegister = (e) => {
     e.preventDefault();
-
+    setLoading(true);
     // Guard protectors
     if (password.current.value.length < 6) {
+      setLoading(false);
       alert("Password length must be at least 6 characters");
       return;
     }
     if (fullname.current.value.length < 1) {
+      setLoading(false);
       alert("Full name length must be at least 1 character");
+
       return;
     }
 
@@ -38,7 +41,8 @@ export default function Register() {
         "state_changed",
         (snapshot) => {},
         (error) => {
-          console.log(error);
+          setLoading(false);
+          alert("Something went wrong, please try again");
         },
         () => {
           getDownloadURL(uploadTask.snapshot.ref).then((url) => {
@@ -52,9 +56,10 @@ export default function Register() {
               .then((res) => {
                 navigate("/login");
               })
-              .catch((error) =>
-                alert("Something went wrong, please try again")
-              );
+              .catch((error) => {
+                setLoading(false);
+                alert("Something went wrong, please try again");
+              });
           });
         }
       );
@@ -72,9 +77,13 @@ export default function Register() {
         .then((res) => {
           navigate("/login");
         })
-        .catch((error) => alert("Something went wrong, please try again"));
+        .catch((error) => {
+          setLoading(false);
+          alert("Something went wrong, please try again");
+        });
     }
   };
+
   return (
     <div className="vh-100">
       <div className="container h-100 w-100 d-flex justify-content-center align-items-center">
@@ -135,9 +144,17 @@ export default function Register() {
                   onChange={handleFileInput}
                 />
               </div>
-              <button type="submit" className="btn btn-primary mt-4">
-                Register
-              </button>
+              {!loading ? (
+                <button type="submit" className="btn btn-primary mt-4">
+                  Register
+                </button>
+              ) : (
+                <div
+                  class="spinner-border text-primary mt-4"
+                  role="status"
+                ></div>
+              )}
+
               <p className="notRegisteredYet mt-3">
                 Already have an Account?
                 <a

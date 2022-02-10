@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { loginCall } from "../../apiCalls";
 import "./login.css";
 export default function Login({ user, setUser }) {
@@ -6,9 +6,10 @@ export default function Login({ user, setUser }) {
   // const { user, isFetching, error, dispatch } = useContext(AuthContext);
   const email = useRef("");
   const password = useRef("");
+  const [loading, setLoading] = useState(false);
   const handleLogin = (e) => {
     e.preventDefault();
-    e.target.classList.add("disabled");
+    setLoading(true);
     let userCredentials = {
       email: email.current.value,
       password: password.current.value,
@@ -18,7 +19,10 @@ export default function Login({ user, setUser }) {
         localStorage.setItem("token", res.data.token);
         setUser(res.data.other);
       })
-      .catch((err) => alert("Email or password incorrect"));
+      .catch((err) => {
+        alert("Email or password incorrect");
+        setLoading(false);
+      });
   };
 
   return (
@@ -58,9 +62,16 @@ export default function Login({ user, setUser }) {
                   placeholder="Password"
                 />
               </div>
-              <button type="submit" className="btn btn-primary mt-4">
-                Login
-              </button>
+              {!loading ? (
+                <button type="submit" className="btn btn-primary mt-4">
+                  Login
+                </button>
+              ) : (
+                <div
+                  class="spinner-border text-primary mt-4"
+                  role="status"
+                ></div>
+              )}
               <p className="notRegisteredYet mt-5">
                 Not registered yet?
                 <a
