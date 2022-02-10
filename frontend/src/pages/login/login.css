@@ -1,3 +1,7 @@
+.loginContainer {
+  min-height: 88vh;
+}
+
 .logo {
   /* color: #08d9d6; */
   font-size: 50px;
