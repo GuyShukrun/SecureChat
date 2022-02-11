@@ -1,5 +1,5 @@
 # SecureChat
-SecureChat is a free real-time chat website where people can connect with other members
+SecureChat is a free real-time chat website where people can connect with their friends!
 
 # Live demo
 You can visit SecureChat here:
